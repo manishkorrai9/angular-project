@@ -1,0 +1,252 @@
+<div
+  class="sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent"
+>
+  <div class="relative flex pt-6 px-6 md:px-8">
+    <div class="text-4xl font-extrabold tracking-tight">Follow Ups</div>
+  </div>
+
+  <div
+    class="sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent height-calc"
+  >
+    <div
+      class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b"
+    >
+      <div class="flex w-full">
+        <mat-form-field
+          class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-rounded"
+          [ngClass]="{
+            'sm:w-96': userInfo.role_id == 5,
+            'sm:w-80': userInfo.role_id != 5
+          }"
+        >
+          <mat-icon
+            class="icon-size-5"
+            matPrefix
+            [svgIcon]="'heroicons_solid:search'"
+          >
+          </mat-icon>
+          <input
+            matInput
+            (input)="filterData($event.target.value)"
+            [autocomplete]="'off'"
+            [placeholder]="'Search for Patient Name, Phone Number, UHID'"
+          />
+        </mat-form-field>
+        <mat-form-field
+          *ngIf="userInfo.role_id != 5"
+          class="fuse-mat-dense fuse-mat-no-subscript sm:w-60 fuse-mat-rounded mx-2"
+          floatLabel="always"
+        >
+          <mat-select
+            [placeholder]="'All Doctors'"
+            [(value)]="selectedDoctor"
+            (selectionChange)="onDoctorChange($event)"
+          >
+            <mat-option [value]="'all'">All Doctors</mat-option>
+            <ng-container *ngFor="let data of doctors">
+              <mat-option [value]="data.doctorid"
+                >{{ data.details }}
+              </mat-option>
+            </ng-container>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <!-- Search -->
+
+      <!-- Actions -->
+      <!-- <div class="flex flex-shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+        <mat-form-field
+          class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-rounded mx-2 w-44"
+          floatLabel="always"
+        >
+          <mat-select
+            [placeholder]="'All Consultations'"
+            (selectionChange)="onSelectionChange($event)"
+          >
+            <mat-option [value]="0">All Consultations</mat-option>
+            <ng-container *ngFor="let data of visits">
+              <mat-option [value]="data.masterdata_id"
+                >{{ data.data_name }}
+              </mat-option>
+            </ng-container>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field
+          class="fuse-mat-dense fuse-mat-no-subscript sm:w-44 fuse-mat-rounded mx-2"
+          floatLabel="always"
+        >
+          <mat-select
+            [(value)]="selectedStatus"
+            [placeholder]="'All Status'"
+            (selectionChange)="onStatusChange($event)"
+          >
+            <mat-option [value]="0">All</mat-option>
+            <ng-container *ngFor="let data of statusTypes">
+              <mat-option [value]="data.masterdata_id"
+                >{{ data.data_name }}
+              </mat-option>
+            </ng-container>
+          </mat-select>
+        </mat-form-field>
+
+        <button
+          class="bg-blue-400 text-white"
+          mat-flat-button
+          (click)="bookAppointment()"
+          *ngIf="
+            !(
+              userInfo.admin_account == 3 &&
+              (userInfo.role_id == 5 || userInfo.role_id == 4)
+            )
+          "
+        >
+          <mat-icon [svgIcon]="'heroicons_outline:plus-circle'"></mat-icon>
+          <span class="ml-2 mr-1">Add Appointment</span>
+        </button>
+      </div> -->
+    </div>
+
+    <!-- Main -->
+    <div class="flex flex-auto overflow-hidden">
+      <!-- Users list -->
+      <div
+        class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto"
+      >
+        <ng-container *ngIf="(patients$ | async)?.length > 0; else noPatients">
+          <div class="grid">
+            <!-- Header -->
+            <div
+              class="hospital-follow-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+              matSort
+              (matSortChange)="sortData($event)"
+              
+            >
+              <div
+                class="hidden md:block items-center"
+                [mat-sort-header]="'first_name'"
+              >
+                Patient Info
+              </div>
+              <div >Doctor Info</div>
+              <div class="hidden md:block items-center">Follow up Date</div>
+              <div class="hidden md:block items-center">
+                Last Appointment
+              </div>
+
+              <div class="hidden lg:block items-center">Actions</div>
+            </div>
+            <!-- Rows -->
+            <ng-container *ngIf="patients$ | async as patients">
+              <!-- use Ng for dynmaic data -->
+              <ng-container *ngFor="let data of patients; let i = index">
+                <div
+                  class="grid hospital-follow-grid items-center  gap-4 py-3 px-6 md:px-8 border-b"
+                  
+                >
+                  <div (click)="setDisplayPrescription()">
+                    <span
+                      class="font-semibold capitalize"
+                      [matTooltip]="
+                        data?.patient_full_name.length > 25
+                          ? data?.patient_full_name
+                          : ''
+                      "
+                      >{{
+                        data?.patient_full_name?.length > 25
+                          ? (data?.patient_full_name | slice : 0 : 25) + " ..."
+                          : data?.patient_full_name.trim()
+                      }}</span
+                    >
+                    <span
+                      >, {{ data?.age }}yrs,
+                      <span class="capitalize">{{ data?.gender }}</span></span
+                    ><br />
+                    <span *ngIf="data.mobile_no" class="text-secondary pt-2"
+                      >+91 {{ addSpace(data?.mobile_no) }}</span
+                    >
+                  </div>
+                  <div >
+                    <span class="font-semibold capitalize"
+                      >Dr. {{ data?.doctor_name }}</span
+                    ><br />
+                    <span class="text-secondary pt-2">{{
+                      data?.speciality
+                    }}</span>
+                  </div>
+
+                 
+
+                  
+
+                  <div>
+                    <div class="pt-2">
+                      {{ data?.next_visit_date | date : "MMM d, y" }}
+                    </div>
+                  </div>
+                  <div>
+                    <div class="pt-2">
+                      {{ data?.appointment_date | date : "MMM d, y | hh:mm a" }}
+                    </div>
+                  </div>
+
+                  <div class="flex hidden lg:block items-center">
+                    <div class="pr-2">
+                      <button
+                      class="min-w-10 min-h-7 h-7 px-0 leading-6 "
+                      (click)="appointmentEdit(data,'foloow-ups')"
+                      [matTooltip]="'Approve'"
+                      
+                    >
+                    <!-- [disabled]="data?.status === 'Cancelled' || data?.status === 'Running' " -->
+                    <mat-icon
+                    
+                    svgIcon="heroicons_outline:calendar"
+                  ></mat-icon>
+                    </button>
+                      <button
+                        class="min-w-10 min-h-7 h-7  ml-2 leading-6"
+                        (click)="cancelAppointment(data)"
+                        [matTooltip]="'Cancel'"
+                       
+                      >
+                      <!--  [disabled]="data?.status === 'Cancelled' || data?.status === 'Running'" -->
+                        <img
+                        
+                          class="w-5"
+                          src="../../../../../assets/images/clock.svg"
+                        />
+                        <!-- [class]="(data?.status === 'Cancelled' || data?.status === 'Completed' || data?.status === 'Running')? 'opacity-30': ' '" -->
+                      </button>
+
+                     
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </ng-container>
+          </div>
+
+          <mat-paginator
+            class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+            [ngClass]="{ 'pointer-events-none': isLoading }"
+            [length]="totalRecords$ | async"
+            [pageIndex]="currentPage"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="[10]"
+            [showFirstLastButtons]="true"
+            (page)="pageEvent = $event; onPageChange($event)"
+          ></mat-paginator>
+        </ng-container>
+
+        <ng-template #noPatients>
+          <div
+            class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center"
+          >
+            There are no appointments!
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

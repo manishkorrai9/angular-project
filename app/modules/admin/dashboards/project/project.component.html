@@ -1,0 +1,655 @@
+<div class="flex flex-col flex-auto min-w-0">
+  <!-- Header -->
+  <div class="bg-card">
+    <div
+      class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b"
+    >
+      <div class="text-4xl font-extrabold tracking-tight">
+        <ng-container *transloco="let t">
+          <div
+            class="text-2xl md:text-5xl font-semibold tracking-tight leading-7 md:leading-snug truncate capitalize"
+          >
+            {{ t("Welcome") }},
+            <span *ngIf="(accountInfo | async)?.admin_account != 3"><span *ngIf="(accountInfo | async)?.role_id == 5">Dr. </span>{{
+              (accountInfo | async)?.admin_name
+            }}</span
+            ><span *ngIf="(accountInfo | async)?.admin_account == 3"
+              ><span *ngIf="(accountInfo | async)?.role_id == 5">Dr. </span>{{ (accountInfo | async)?.first_name }}
+              {{ (accountInfo | async)?.last_name }}</span
+            >
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="flex flex-shrink-0 items-center mt-6 sm:mt-0 sm:ml-4" >
+      
+
+        <mat-form-field
+        *ngIf="userInfo.role_id != 5 && !(userInfo.admin_account == 3 && userInfo.role_id == 6)"
+        class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-rounded mx-2 w-72"
+        floatLabel="always"
+      >
+      <mat-select
+      [placeholder]="'All Doctors'"
+      [(value)]="selectedDoctor"
+      (selectionChange)="onDoctorChange($event)"
+    >
+    <mat-option [value]="'all'">All Doctors</mat-option>
+      <ng-container *ngFor="let data of doctors">
+        <mat-option [value]="data.doctorid"
+          >{{ data.details }}
+        </mat-option>
+      </ng-container>
+    </mat-select>
+      </mat-form-field>
+       
+
+        <button *ngIf="!(userInfo.admin_account == 3 && userInfo.role_id == 6)"
+          mat-flat-button
+          class="bg-blue-400 text-white ml-4"
+          (click)="addPatient()"
+        >
+          <mat-icon [svgIcon]="'heroicons_outline:plus-circle'"></mat-icon>
+          <span class="ml-2 mr-1">Add Patient</span>
+        </button>
+
+        <!-- Add product button -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <ng-container >
+    <div class="flex-auto border-t -mt-px pt-4 pb-4 sm:pt-6">
+      <div class="w-full max-w-screen-xl mx-auto px-6" *ngIf="dashBoardInfo$ | async as dashboardInfo">
+        <div 
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full min-w-0"
+        >
+          <!-- Users -->
+          <div
+            class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden"
+          >
+            <div class="flex items-start justify-between">
+              <div
+                class="text-lg font-medium tracking-tight leading-6 truncate"
+              >
+                All Patients
+              </div>
+            </div>
+            <div class="flex flex-col items-center mt-2">
+              <div
+                class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-blue-500"
+              >
+                {{ dashboardInfo?.patient_count }}
+              </div>
+              <div
+                class="flex items-baseline justify-center w-full mt-5 text-secondary"
+              >
+                <div class="text-md font-medium truncate">Total</div>
+              </div>
+            </div>
+          </div>
+          <!-- Service Man -->
+          <div
+            class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden cursor-pointer"
+            (click)="getAppointments(8)"
+          >
+            <div class="flex items-start justify-between">
+              <div
+                class="text-lg font-medium tracking-tight leading-6 truncate"
+              >
+              Today’s queue (24hrs)
+              </div>
+            </div>
+            <div class="flex flex-col items-center mt-2">
+              <div
+                class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-amber-500"
+              >
+                {{ dashboardInfo?.upcoming_count }}
+              </div>
+
+              <div
+                class="flex items-baseline justify-center w-full mt-5 text-secondary"
+              >
+                <div class="text-md font-medium truncate">Total</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Users -->
+          <div
+            class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden cursor-pointer"
+            (click)="getAppointments(10)"
+          >
+            <div class="flex items-start justify-between">
+              <div
+                class="text-lg font-medium tracking-tight leading-6 truncate"
+              >
+                
+              Completed (30 days) 
+              </div>
+            </div>
+            <div class="flex flex-col items-center mt-2">
+              <div
+                class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-green-500"
+              >
+                {{ dashboardInfo?.completed_count }}
+              </div>
+              <div
+                class="flex items-baseline justify-center w-full mt-5 text-secondary"
+              >
+                <div class="text-md font-medium truncate">Total</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Doctors -->
+          <div
+            class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden cursor-pointer"
+            (click)="getAppointments(13)"
+          >
+            <div class="flex items-start justify-between">
+              <div
+                class="text-lg font-medium tracking-tight leading-6 truncate"
+              >
+               
+              Cancelled (30 days)
+              </div>
+            </div>
+            <div class="flex flex-col items-center mt-2">
+              <div
+                class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-red-500"
+              >
+                {{ dashboardInfo?.cancelled_count }}
+              </div>
+              <div
+                class="flex items-baseline justify-center w-full mt-5 text-secondary"
+              >
+                <div class="text-md font-medium truncate">Total</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> 
+
+
+    
+      <div class="flex-auto -mt-px pt-4 pb-4 sm:pt-6" >
+        <div class="w-full max-w-screen-xl mx-auto px-6">
+          <div
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full min-w-0" 
+          >
+            <!-- Patient Information Graph -->
+            <div
+              class="sm:col-span-2 md:col-span-4 flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden"
+            >
+              <!-- <div class="relative flex  px-6 md:px-8">
+             
+              <div class="text-4xl font-extrabold tracking-tight">Patient List</div>   
+          </div> -->
+              <div 
+                class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-4 px-6 md:px-8 border-b"
+              >
+                <div class="text-4xl font-extrabold tracking-tight">
+                  <!-- Patient List -->
+                  {{ (userInfo.admin_account == 3 && (userInfo.role_id == 6 || userInfo.role_id == 4)) ? 'Requested List' :'Patient List'}} 
+                </div>
+
+                <!-- Search -->
+                <mat-form-field
+                  class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-rounded w-2/5"
+                >
+                  <mat-icon
+                    class="icon-size-5"
+                    matPrefix
+                    [svgIcon]="'heroicons_solid:search'"
+                  ></mat-icon>
+                  <input
+                    matInput
+                    (input)="filterData($event.target.value)"
+                    [autocomplete]="'off'"
+                    [value]="searchedTerm"
+                    [placeholder]="'Search for Patient Name, Phone Number, UHID'"
+                  />
+                </mat-form-field>
+                <!-- Actions -->
+                <!-- <div
+                  class="flex flex-shrink-0 items-center mt-6 sm:mt-0 sm:ml-4 "
+                >
+                 
+                  <button
+                    mat-icon-button
+                    class="text-white ml-2 w-10"
+                    (click)="downloadData()"
+                    [matTooltip]="'Download Appointments'"
+                  >
+                    <mat-icon
+                      class="text-blue-500"
+                      [svgIcon]="'heroicons_outline:download'"
+                    ></mat-icon>
+                  </button>
+                </div> -->
+              </div>
+
+              <!-- Main -->
+              <div class="flex flex-auto overflow-hidden" *ngIf="!(userInfo.admin_account == 3 && (userInfo.role_id == 6 || userInfo.role_id == 4))">
+                <!-- Users list -->
+                <div
+                  class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto"
+                >
+                  <ng-container
+                    *ngIf="patients$ | async as patients; else noPatients"
+                  >
+                    <div class="grid"> 
+                      <!-- Header -->
+                      <div 
+                      [ngClass]="userInfo.role_id == 5 ? 'doctor-inventory-grid' : 'inventory-grid '"
+                        class="z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+                        matSort
+                        (matSortChange)="sortData($event)"
+                      >
+                        <div
+                          class="hidden md:block items-center"
+                          [mat-sort-header]="'first_name'"
+                        >
+                          Patient Info
+                        </div>
+                        <div class="hidden md:block items-center">
+                          Phone Number
+                        </div>
+
+                        <div
+                          class="hidden md:block items-center"
+                          [mat-sort-header]="'created_on'"
+                        >
+                          Register Date
+                        </div>
+                        <div class="hidden md:block items-center">
+                          Last Visit Date
+                        </div>
+                        <div class="hidden lg:block items-center text-center">Actions</div>
+                      </div>
+                      <!-- Rows -->
+                      <ng-container *ngIf="patients$ | async as patients">
+                        <!-- use Ng for dynmaic data -->
+                        <ng-container
+                          *ngFor="
+                            let data of patients;
+                            let i = index;
+                            trackBy: trackByFn
+                          "
+                        >
+                          <div
+                          [ngClass]="userInfo.role_id == 5 ? 'doctor-inventory-grid' : 'inventory-grid '"
+                            class="grid items-center gap-4 py-3 px-6 md:px-8 border-b"
+                          >
+                            <!-- patient Id -->
+                            <!-- <div>HK00000{{i+1}}</div> -->
+
+                            <!-- User Info --> 
+                            <div
+                              [routerLink]="['/pages/profile']"
+                              [queryParams]="{ id: data?.user_id }"
+                              (click)="setDisplayPrescription()"
+                            >
+                              <!-- <span class="font-semibold capitalize text-blue-500 cursor-pointer">{{ data?.first_name.trim() }}<span *ngIf="data?.last_name"> {{ data?.last_name.trim() }}</span>, -->
+                              <span
+                                class="font-semibold capitalize text-blue-500 cursor-pointer"
+                                [matTooltip]="
+                                  data?.full_name.length > 25
+                                    ? data?.full_name
+                                    : ''
+                                "
+                                >
+                                
+                                {{
+                                  data?.full_name?.length > 25
+                                    ? (data?.full_name | slice: 0:25) + " ..."
+                                    : data?.full_name.trim()
+                                }},
+                              </span>
+                              <span *ngIf="data?.age > 0">
+                                {{ data?.age }} yrs,</span
+                              >
+                              <span class="capitalize"> {{ data?.gender }}</span
+                              ><br /><span>{{ data?.patient_uniqueid }}</span>
+                            </div>
+                            <!-- Contact Info -->
+                            <div>
+                              <span *ngIf="data.mobile_no"
+                                >+91 {{ addSpace(data?.mobile_no) }}</span
+                              >
+                            </div>
+
+                            <!-- patient risk level -->
+                            <!-- <div>
+                                          <span>--</span>
+                                      </div> -->
+
+                            <div>
+                              {{ data?.created_on | date: "d MMM, y" }}
+                            </div>
+                            <div>
+                              {{
+                                data?.lastappointment_completed
+                                  ? (data?.lastappointment_completed
+                                    | date: "d MMM, y")
+                                  : "--"
+                              }}
+                            </div> 
+                            <!-- Status -->
+                            <!-- <div><mat-icon (click)="bookAppointment(data)" svgIcon="heroicons_outline:calendar" [matTooltip]="'Create Appointment'"></mat-icon>
+                                          <mat-icon [matTooltip]="'reports'" svgIcon="heroicons_outline:folder" [routerLink]="['/reports']" [queryParams]="{ id: data?.user_id }"></mat-icon>
+                                      </div> -->
+                            <div class="flex" *ngIf="!(userInfo.admin_account != 3 && userInfo.role_id == 5)">
+                              <div class="pr-1">
+                                <button
+                                  class="min-w-10 min-h-7 h-7 px-0 leading-6"
+                                  (click)="bookAppointment(data, 'clintel')"
+                                  [matTooltip]="'Create Appointment'"
+                                >
+                                  <mat-icon
+                                    color="primary"
+                                    svgIcon="heroicons_outline:calendar"
+                                  ></mat-icon>
+                                </button>
+                              </div>
+                              <!-- <div class="pr-2">
+                                <button
+                                  class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                                  [routerLink]="['/reports']"
+                                  [queryParams]="{ id: data?.user_id }"
+                                  [matTooltip]="'reports'"
+                                >
+                                  <mat-icon
+                                    color="purple"
+                                    svgIcon="heroicons_outline:clipboard-list"
+                                  ></mat-icon>
+                                </button>
+                              </div> -->
+                              <div class="pr-1">
+                                <button
+                                  class="min-w-10 min-h-7 h-7 px-0 leading-6"
+                                  (click)="addTestModel(data)"
+                                  [matTooltip]="'Add Lab Tests'"
+                                >
+                                <mat-icon svgIcon="heroicons_outline:beaker"></mat-icon>
+
+                                </button>
+                              </div>
+
+                              <div class="pr-1">
+                                <button
+                                  class="min-w-10 min-h-7 h-7 px-0 leading-6"
+                                  (click)="addIP(data)"
+                                  [matTooltip]="'IP Billing'"
+                                >
+                                <mat-icon svgIcon="heroicons_outline:plus-circle"></mat-icon>
+
+                                </button>
+                              </div>
+
+                              <div class="pr-1">
+                                <button
+                                  class="min-w-10 min-h-7 h-7 px-0 leading-6"
+                                  (click)="editPatient(data)"
+                                  [matTooltip]="'Edit Patient'"
+                                >
+                                <mat-icon svgIcon="heroicons_solid:pencil-alt"></mat-icon>
+
+                                </button>
+                              </div>
+
+                              <!-- <div class="pr-1">
+                                <button
+                                  class="w-8 h-8 min-h-8 px-0 leading-6"
+                                  mat-icon-button
+                                  [matMenuTriggerFor]="listMenu"
+                                  [matTooltip]="'More'"
+                                >
+                                <mat-icon svgIcon="heroicons_solid:dots-vertical"></mat-icon>
+
+                              </button>
+                              <mat-menu #listMenu="matMenu">
+                                <button
+                                    mat-menu-item
+                                    (click)="editPatient(data)">
+                                    <mat-icon
+                                        class="icon-size-5"
+                                        [svgIcon]="'heroicons_solid:pencil-alt'"></mat-icon>
+                                    Edit patient
+                                </button>
+                                <button
+                                    mat-menu-item
+                                    (click)="deleteRecord(data)">
+                                    <mat-icon
+                                        class="icon-size-5"
+                                        [svgIcon]="'heroicons_solid:trash'"></mat-icon>
+                                    Delete patient
+                                </button>
+                            </mat-menu>
+                              </div> -->
+                              <!-- <div class="pr-1">
+                                <button
+                                  class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                                  (click)="editPatient(data)"
+                                  [matTooltip]="'edit'"
+                                >
+                                  <mat-icon
+                                    color="purple"
+                                    svgIcon="heroicons_outline:pencil"
+                                  ></mat-icon>
+                                </button>
+                              </div>
+                             
+                              <div class="pr-1">
+                                <button
+                                  class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                                  (click)="deleteRecord(data)"
+                                  [matTooltip]="'delete'"
+                                >
+                                  <mat-icon
+                                    color="purple"
+                                    svgIcon="heroicons_outline:trash"
+                                  ></mat-icon>
+                                </button>
+                              </div> -->
+                            </div>
+                          </div>
+                        </ng-container>
+                      </ng-container>
+                    </div>
+
+                    <mat-paginator
+                      class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+                      [ngClass]="{ 'pointer-events-none': isLoading }"
+                      [length]="totalRecords$ | async"
+                      [pageIndex]="currentPage"
+                      [pageSize]="pageSize"
+                      [pageSizeOptions]="[5]"
+                      [showFirstLastButtons]="true"
+                      (page)="pageEvent = $event; onPageChange($event)"
+                    ></mat-paginator>
+                  </ng-container>
+
+                  <ng-template #noPatients>
+                    <div
+                      class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center"
+                    >
+                      No Records
+                    </div>
+                  </ng-template>
+                </div>
+              </div>
+              <!-- Requested List -->
+              <div class="flex flex-auto overflow-hidden lablst-ht" *ngIf="(userInfo.admin_account == 3 && (userInfo.role_id == 6 || userInfo.role_id == 4))">
+                <!-- Users list -->
+                <div
+                  class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto"
+                >
+                  <ng-container
+                    *ngIf="requestedPatients$ | async as patients; else noPatients"
+                  >
+                    <div class="grid">
+                      <!-- Header -->
+                      <div
+                        class="inventory-grid z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+                        matSort
+                        (matSortChange)="sortData($event)"
+                      >
+                        <div
+                          class="hidden md:block items-center"
+                          [mat-sort-header]="'first_name'"
+                        >
+                          Patient Info
+                        </div>
+                        <div class="hidden md:block items-center">
+                          Phone Number
+                        </div>
+
+                        <div
+                          class="hidden md:block items-center"
+                          [mat-sort-header]="'created_on'"
+                        >
+                        Requested Date
+                        </div>
+                        <div class="hidden md:block items-center">
+                          Status
+                        </div>
+                        <div class="hidden md:block items-center">Actions</div>
+                      </div>
+                      <!-- Rows -->
+                      <ng-container *ngIf="requestedPatients$ | async as patients">
+                        <!-- use Ng for dynmaic data -->
+                        <ng-container
+                          *ngFor="
+                            let data of patients;
+                            let i = index;
+                            trackBy: trackByFn
+                          "
+                        >
+                          <div
+                            class="inventory-grid grid items-center gap-4 py-3 px-6 md:px-8 border-b"
+                          >
+                          
+                            <div
+                             
+                            >
+                             
+                              <span
+                                class="font-semibold capitalize"
+                                [matTooltip]="
+                                  data?.full_name.length > 25
+                                    ? data?.full_name
+                                    : ''
+                                "
+                                >{{
+                                  data?.full_name?.length > 25
+                                    ? (data?.full_name | slice: 0:25) + " ..."
+                                    : data?.full_name.trim()
+                                }},
+                              </span>
+                              <span *ngIf="data?.age > 0">
+                                {{ data?.age }} yrs,</span
+                              >
+                              <span class="capitalize"> {{ data?.gender }}</span
+                              ><br /><span>{{ data?.patient_uniqueid }}</span>
+                            </div>
+                            
+                            <div>
+                              <span *ngIf="data.mobile_no"
+                                >+91 {{ addSpace(data?.mobile_no) }}</span
+                              >
+                            </div>
+
+                            
+
+                            <div>
+                              {{ data?.requested_on | date: "d MMM, y" }}
+                            </div>
+                            <div
+                            [ngClass]="{
+                              'text-orange-300':
+                                data?.request_status === 'InProcess',
+                              'text-amber-500':
+                                data?.request_status === 'Reschedule',
+                                'text-green-500':
+                                data?.request_status === 'Booked Appointment',
+                                'text-red-500':
+                                data?.request_status === 'Cancelled'
+                            }"
+                          >
+                            {{ data?.request_status }}
+                          </div>
+                            
+                          <div class="flex">
+                            <div class="pr-1"> 
+                              <button
+                                class="min-w-10 min-h-7 h-7 px-0 leading-6"
+                                *ngIf="data?.request_status === 'InProcess'"
+                                (click)="bookRequestAppointment(data,'InProcess')"
+                                [matTooltip]="'Book Appointment'"
+                              >
+                                <mat-icon
+                                  svgIcon="heroicons_outline:calendar"
+                                ></mat-icon>
+                              </button>
+                              <button
+                                class="min-w-10 min-h-7 h-7 px-0 leading-6"
+                                *ngIf="data?.request_status === 'Reschedule'"
+                                (click)="bookRequestAppointment(data)"
+                                [matTooltip]="'Reschedule'"
+                              >
+                                <mat-icon
+                                  svgIcon="heroicons_solid:calendar"
+                                ></mat-icon>
+                              </button>
+                            </div>
+
+                            <div class="pr-2 ">
+                              <button
+                                class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                                (click)="deleteAppointment(data)"
+                                *ngIf="data?.request_status === 'Booked Appointment'"
+                                [matTooltip]="'Cancel'"
+                              >
+                                <mat-icon
+                                  color="warn"
+                                  svgIcon="heroicons_solid:x-circle"
+                                ></mat-icon>
+                              </button>
+                            </div>
+                          </div>
+                          </div>
+                        </ng-container>
+                      </ng-container>
+                    </div>
+
+                    <mat-paginator
+                      class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+                      [ngClass]="{ 'pointer-events-none': isLoading }"
+                      [length]="requestedTotalRecords$ | async"
+                      [pageIndex]="currentPage"
+                      [pageSize]="pageSize"
+                      [pageSizeOptions]="[5]"
+                      [showFirstLastButtons]="true"
+                      (page)="pageEvent = $event; onRequestPageChange($event)"
+                    ></mat-paginator>
+                  </ng-container>
+
+                  <ng-template #noPatients>
+                    <div
+                      class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center"
+                    >
+                      No Records
+                    </div>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

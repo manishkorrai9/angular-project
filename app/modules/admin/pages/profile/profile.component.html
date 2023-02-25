@@ -1,0 +1,2629 @@
+<!-- *******************************************************
+ 1) For expert Opionion / kidney disease management details 
+    search for "EXPERT OPINION & KIDNEY DISEASE MANAGEMENT" / *ngIf="user.admin_account === 3"
+
+ 2)For clintel patient details 
+    search for "CLINTEL PATIENT DETAILS" / *ngIf="user.admin_account !== 3"
+    ----- Phaneendra
+ ************************************************************-->
+
+
+<div class="flex flex-col flex-auto min-w-0">
+   
+<!-- **********************
+  PATIENT PROFILE STRIP
+ ***************************-->
+  <div class="flex flex-col shadow-new bg-card">
+    
+    <div class="flex flex-col flex-0 lg:flex-row items-center mt-2 w-full mx-auto px-8 lg:h-18 bg-card">
+      <a class="pr-3 mr-10" mat-button [color]="'primary'" (click)="goBack()">
+        <mat-icon [svgIcon]="'heroicons_outline:arrow-narrow-left'"></mat-icon>
+        <span>Back</span>
+      </a>
+      <ng-container *ngIf="patient$ | async as patient"> 
+        <!-- Avatar -->
+        <div class="flex items-center mt-6 mb-2 lg:mt-0 space-x-6">
+          <img
+            *ngIf="patient?.photo_folderpath && patient?.photo_filename"
+            class="w-10"
+            class="w-10 h-10 rounded-full"
+            [src]="photo ? photo : 'assets/images/avatars/img_avatar.png'"
+          />
+
+          <mat-icon
+            *ngIf="!(patient?.photo_folderpath && patient?.photo_filename)"
+            >person</mat-icon
+          >
+        </div>
+
+        <!-- Details -->
+        <div
+          class="flex flex-col items-center lg:items-start mt-4 lg:mt-0 lg:ml-4"
+        >
+          <div class="text-lg font-bold leading-none">
+            {{ patient.first_name }} {{ patient.last_name }} - 
+            {{ patient.age }}yrs,
+            <span class="capitalize">{{ patient.gender }}</span>
+           
+          </div>
+          <div class="text-secondary pt-1">+91 {{ patient.mobile_no }}</div>
+        </div>
+
+        
+        <div class="flex items-center mt-8 mb-4 lg:m-0 lg:ml-auto space-x-6">
+         
+
+          <!-- <button mat-stroked-button class="text-white rounded-full bg-primary">
+            Start Second Opinion
+          </button> -->
+        </div>
+      </ng-container>
+      <!-- [ngClass]="{ 'bg-saffran': isAppointmentRunning }" -->
+      
+      <div class="text-right">
+        
+        <div class="flex items-start">
+          <div  class="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-3">
+            <div class="flex flex-col">
+              <div class="flex items-center">
+                <div class="font-medium text-secondary leading-5">Height</div>
+              </div>
+              <div class="flex items-start"> 
+                <div class="text-lg font-bold">
+                  {{measurementObj?.height ? measurementObj.height :'--'}} {{measurementObj?.heightscale}}
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <div class="flex items-center">
+                <div class="font-medium text-secondary leading-5">Weight</div>
+              </div>
+              <div class="flex items-start">
+                <div class="text-lg font-bold">
+                  <!-- {{measurementObj?.weight ? measurementObj.weight : '--'}} {{measurementObj?.weightscalename}} -->
+                  {{ latestWeight ? latestWeight : "--" }} {{ scalename }}
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <div class="flex items-center">
+                <div class="font-medium text-secondary leading-5">BMI</div>
+              </div>
+              <div class="flex items-start ">
+                <div class="text-lg font-bold">
+                 {{bmi ? bmi : '--'}}
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <div class="flex items-center">
+                <div class="font-medium text-secondary leading-5">Blood Group</div>
+              </div>
+              <div class="flex items-start">
+                <div class="text-lg font-bold">
+                  {{measurementObj?.bloodgroup ||  '--'}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      <button  *ngIf="followUp?.status_id == 8 || followUp?.status_id == 9" 
+      (click)="gotNewTabPrescription()" mat-flat-button class="text-white ml-10" [color]="'primary'">Start Consultation
+    </button>
+    <button
+    mat-stroked-button
+    class="text-white rounded-full bg-blue-600 ml-10"
+    *ngIf=" user?.role_id == 5 && appointmentId && prescriptionStatus?.status && prescriptionStatus?.status != 'Completed'"
+    (click)="gotNewTabPrescription()"
+  >
+    {{ prescriptionStatus?.status == "Completed" ? "View " : videoCallCompleted ? "View " : prescriptionStatus.schedule_typeid == "73" ? "Start Video " : "Start " }}
+    {{ prescriptionStatus.schedule_typeid == "73" ? "Consultation" : "Prescription"  }}
+  </button>
+  <button
+    mat-stroked-button
+    class="text-white rounded-full bg-blue-600 ml-10"
+    *ngIf=" user?.role_id == 5 && appointmentId && prescriptionStatus?.status && prescriptionStatus?.status == 'Completed'"
+    (click)="editNewTabPrescription()"
+  >
+    Edit Prescription
+  </button>
+
+    </div>
+  </div> 
+<!-- (click)="editPrescription(appointment.patient_id, appointment.calender_id)" -->
+<!--************************************************************* 
+  EXPERT OPINION & KIDNEY DISEASE MANAGEMENT PATIENT DETAILS HERE
+ *****************************************************************-->
+  
+<!--**************************** 
+  CLINTEL PATIENT DETAILS HERE
+ *******************************-->
+
+  <mat-tab-group  class="mt-6 border-b-0 profile-tab" [animationDuration]="'0'" [(selectedIndex)]="tabIndex">
+    <mat-tab label="Clinical Analysis" class="border-b-0 mb-5">
+      <ng-template matTabContent>
+        <div class="mt-6 flex flex-auto w-full mx-auto  space-x-6">
+          <div
+            class="grid grid-cols-4 xl:grid-cols-6 gap-4 w-full mt-1 items-baseline"
+          >
+            <div
+              class="grid gap-8 sm:grid-flow-col xl:grid-flow-row col-span-4 items-start"
+            >
+            
+              <!-- <div
+                class="flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden pb-9"
+              >
+                <div class="flex items-start justify-between m-6 mb-2 pb-2 border-b">
+                  <div class="text-lg font-bold tracking-tight leading-6 truncate inline-flex">
+                    Vitals  <button
+                    mat-icon-button
+                    *ngIf="appointmentId"
+                    (click)="addVitals()"
+                    class="ml-2 icon-size-5 pt-1 text-green-500"
+                    
+                  >
+                    <mat-icon class="text-green-500" [svgIcon]="'heroicons_solid:plus-circle'"></mat-icon>
+                  </button>
+                  </div>
+                  <div class="ml-2">
+                    <button class="h-6 min-h-6 px-2 rounded-full bg-hover" mat-button>
+                      <span class="font-medium text-sm text-secondary"
+                        >Last 30 days</span
+                      >
+                    </button>
+                  </div>
+                </div>
+                <ng-container *ngIf="patientVital$ | async as vital">
+                  <div class="flex items-start mt-3 mx-6">
+                    <div
+                      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 sm:gap-12"
+                    >
+                      <div
+                        class="flex flex-col cursor-pointer border-r"
+                        (click)="getGraphData(1)"
+                      >
+                        <div class="flex items-center">
+                          <div
+                            class="font-medium text-secondary leading-5"
+                            [ngClass]="{ 'vital-active': vitalsType === 1 }"
+                          >
+                            Blood Pressure
+                          </div>
+                        </div>
+                        <div class="flex items-start mt-2" *ngIf="vital?.bp_details">
+                          <div class="text-3xl font-bold tracking-tight leading-none">
+                            {{ vital?.bp_details.systolic_mmhg }}/{{
+                              vital?.bp_details.dystolic_mmhg
+                            }}
+                          </div>
+                          <div class="flex items-center ml-2 mr-2 mt-0.5">
+                            <mat-icon
+                              class="icon-size-5 text-green-500"
+                              [svgIcon]="'heroicons_solid:arrow-circle-up'"
+                            >
+                            </mat-icon>
+                          </div>
+                        </div>
+                        <div class="flex items-center" *ngIf="vital?.bp_details">
+                          <div class="font-light text-secondary mt-2 text-sm">
+                            mmHg
+                          </div>
+                        </div>
+                        <div class="flex items-start mt-2" *ngIf="!vital?.bp_details">
+                          <div class="flex items-center ml-6 mr-2 mt-0.5">--</div>
+                        </div>
+                      </div>
+      
+                      <div
+                        class="flex flex-col cursor-pointer border-r"
+                        (click)="getGraphData(2)"
+                      >
+                        <div class="flex items-center">
+                          <div
+                            class="font-medium text-secondary leading-5"
+                            [ngClass]="{ 'vital-active': vitalsType === 2 }"
+                          >
+                            Heart Rate
+                          </div>
+                        </div>
+                        <div
+                          class="flex items-start mt-2"
+                          *ngIf="vital?.heartrate_details"
+                        >
+                          <div class="text-3xl font-bold tracking-tight leading-none">
+                            {{ vital?.heartrate_details.heart_rate }}
+                          </div>
+                          <div class="flex items-center ml-2 mt-0.5">
+                            <mat-icon
+                              class="icon-size-5 text-red-500"
+                              [svgIcon]="'heroicons_solid:arrow-circle-down'"
+                            >
+                            </mat-icon>
+                          </div>
+                        </div>
+                        <div
+                          class="flex items-center"
+                          *ngIf="vital?.heartrate_details"
+                        >
+                          <div class="font-light text-secondary mt-2 text-sm">
+                            BPM
+                          </div>
+                        </div>
+                        <div
+                          class="flex items-start mt-2"
+                          *ngIf="!vital?.heartrate_details"
+                        >
+                          <div class="flex items-center ml-6 mr-2 mt-0.5">--</div>
+                        </div>
+                      </div>
+                      <div
+                        class="flex flex-col cursor-pointer border-r"
+                        (click)="getGraphData(3)"
+                      >
+                        <div class="flex items-center">
+                          <div
+                            class="font-medium text-secondary leading-5"
+                            [ngClass]="{ 'vital-active': vitalsType === 3 }"
+                          >
+                            Temperature
+                          </div>
+                        </div>
+                        <div class="flex items-start mt-2" *ngIf="vital?.tempdetails">
+                          <div class="text-3xl font-bold tracking-tight leading-none">
+                            {{ vital?.tempdetails.temp_f }}
+                          </div>
+                          <div class="flex items-center ml-2 mt-0.5">
+                            <mat-icon
+                              class="icon-size-5 text-amber-500"
+                              [svgIcon]="'heroicons_solid:arrow-circle-down'"
+                            >
+                            </mat-icon>
+                          </div>
+                        </div>
+                        <div class="flex items-center" *ngIf="vital?.tempdetails">
+                          <div class="font-light text-secondary mt-2 text-sm">
+                            <sup>o</sup>F
+                          </div>
+                        </div>
+                        <div
+                          class="flex items-start mt-2"
+                          *ngIf="!vital?.tempdetails"
+                        >
+                          <div class="flex items-center ml-6 mr-2 mt-0.5">--</div>
+                        </div>
+                      </div>
+                      <div
+                        class="flex flex-col cursor-pointer border-r"
+                        (click)="getGraphData(4)"
+                      >
+                        <div class="flex items-center">
+                          <div
+                            class="font-medium text-secondary pr-3 leading-5"
+                            [ngClass]="{ 'vital-active': vitalsType === 4 }"
+                          >
+                            Respiratory Rate
+                          </div>
+                        </div>
+                        <div
+                          class="flex items-start mt-2"
+                          *ngIf="vital?.respiratory_details"
+                        >
+                          <div class="text-3xl font-bold tracking-tight leading-none">
+                            {{ vital?.respiratory_details.bmp }}
+                          </div>
+                          <div class="flex items-center ml-2 mt-0.5">
+                            <mat-icon
+                              class="icon-size-5 text-green-500"
+                              [svgIcon]="'heroicons_solid:arrow-circle-up'"
+                            >
+                            </mat-icon>
+                          </div>
+                        </div>
+                        <div
+                          class="flex items-center"
+                          *ngIf="vital?.respiratory_details"
+                        >
+                          <div class="font-light text-secondary mt-2 text-sm">
+                            BPM
+                          </div>
+                        </div>
+                        <div
+                          class="flex items-start mt-2"
+                          *ngIf="!vital?.respiratory_details"
+                        >
+                          <div class="flex items-center ml-6 mr-2 mt-0.5">--</div>
+                        </div>
+                      </div>
+      
+                      <div
+                        class="flex flex-col cursor-pointer"
+                        (click)="getGraphData(5)"
+                      >
+                        <div class="flex items-center">
+                          <div
+                            class="font-medium text-secondary leading-5"
+                            [ngClass]="{ 'vital-active': vitalsType === 5 }"
+                          >
+                            Blood Oxygen
+                          </div>
+                        </div>
+                        <div
+                          class="flex items-start mt-2"
+                          *ngIf="vital?.spo2_details"
+                        >
+                          <div class="text-3xl font-bold tracking-tight leading-none">
+                            {{ vital?.spo2_details.value }}
+                          </div>
+                          <div class="flex items-center ml-2 mt-0.5">
+                            <mat-icon
+                              class="icon-size-5 text-green-500"
+                              [svgIcon]="'heroicons_solid:arrow-circle-up'"
+                            >
+                            </mat-icon>
+                          </div>
+                        </div>
+                        <div class="flex items-center" *ngIf="vital?.spo2_details">
+                          <div class="font-light text-secondary mt-2 text-sm">%</div>
+                        </div>
+                        <div
+                          class="flex items-start mt-2"
+                          *ngIf="!vital?.spo2_details"
+                        >
+                          <div class="flex items-center ml-6 mr-2 mt-0.5">--</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+                <div class="flex flex-col flex-auto h-80 mt-6 mx-6 mb-6">
+                  <ng-container
+                    *ngIf="emptyChart || (patientHRGraph$ | async) as patientHR"
+                  >
+                    <apx-chart
+                      *ngIf="vitalsType !== 1"
+                      [series]="chartOptions?.series"
+                      [chart]="chartOptions?.chart"
+                      [xaxis]="chartOptions?.xaxis"
+                      [yaxis]="chartOptions?.yaxis"
+                      [stroke]="chartOptions?.stroke"
+                      [tooltip]="chartOptions?.tooltip"
+                      [dataLabels]="chartOptions?.dataLabels"
+                      [markers]="chartOptions?.markers"
+                      [theme]="chartOptions?.theme"
+                    >
+                    </apx-chart>
+                  </ng-container>
+                  <ng-container
+                    *ngIf="emptyChart || (patientBPGraph$ | async) as patientBPG"
+                  >
+                    <apx-chart
+                      *ngIf="vitalsType === 1"
+                      [chart]="chartBPOptions?.chart"
+                      [series]="chartBPOptions?.series"
+                      [dataLabels]="chartBPOptions?.dataLabels"
+                      [plotOptions]="chartBPOptions?.plotOptions"
+                      [xaxis]="chartBPOptions?.xaxis"
+                      [yaxis]="chartBPOptions?.yaxis"
+                      [tooltip]="chartBPOptions?.tooltip"
+                    >
+                    </apx-chart>
+                  </ng-container>
+                </div>
+              </div> -->
+              <!-- Current statement -->
+              <div
+                class="relative flex flex-col flex-auto bg-card shadow rounded-2xl h-350"
+              >
+                <div
+                  class="flex items-start justify-between m-6 mb-2 pb-2 border-b items-start"
+                >
+                  <div class="text-lg font-bold tracking-tight leading-6 truncate">
+                    Reports
+                  </div>
+                  <div class="ml-2">
+                    <mat-button-toggle-group
+                      class="profile-button-group"
+                      [(ngModel)]="toggleGroupType"
+                      #taskDistributionWeekSelector="matButtonToggleGroup"
+                    >
+                      <mat-button-toggle
+                        [value]="55"
+                        (click)="report(55)"
+                        >Prescriptions
+                      </mat-button-toggle>
+                      <mat-button-toggle [value]="57" (click)="report(57)"
+                        >Lab</mat-button-toggle
+                      >
+                      <!-- <mat-button-toggle
+                        value="investigation"
+                        (click)="report('investigation')"
+                        >Radiology
+                      </mat-button-toggle> -->
+                      <mat-button-toggle value="all" (click)="report('all')"
+                        >View All
+                      </mat-button-toggle>
+                    </mat-button-toggle-group>
+                  </div>
+                </div>
+      
+                <div class="flex flex-col flex-auto mb-4 mt-1 mx-6 overflow-y-auto">
+                  <div class="h-full">
+                    <div class="flex flex-wrap -m-2 mt-2 h-full" *ngIf="isPrescription">
+                      <ng-container *ngIf="investigationReport$ | async as reports;else noReports">
+                        <ng-container *ngIf="reports.length; else noItems">
+                          <div class="flex flex-wrap w-full">
+      
+                            <div
+                            class="appointments-results "
+                            infinite-scroll
+                            [scrollWindow]="false"
+                            [infiniteScrollDistance]="2"
+                            [infiniteScrollThrottle]="500"          
+                            (scrolled)="onScrollDownReports($event)"
+                          >
+                          <ng-container *ngFor="let report of reports">
+                            <ng-container *ngIf="report.listOfFiles && report.listOfFiles.length !==0 && report.listOfFiles[0].mime_type.includes('image')">
+                              <a
+                              class="flex flex-col w-40 h-40 m-2 shadow rounded-2xl cursor-pointer bg-card bg-no-repeat	bg-cover" [ngStyle]="{background: 'linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,.4)),url(\'' + report.src  +'\')'}"
+                              (click)="
+                                downloadFile(report)
+                              "
+                            >
+                              <div class="aspect-w-9 aspect-h-6">
+                               
+                              </div>
+                              <div
+                                class="flex flex-col flex-auto pl-2.5	rounded-b-2xl	 text-left text-sm font-medium bg-white h-10 pt-2.5"
+                              >
+                              <div class="flex">
+                                Uploaded on  {{ report.created_on | date: 'dd/MMM/yyyy' }}
+  
+                                
+                                <!-- - {{ file.created_on | date: 'dd/MMM/yyyy' }} -->
+                              </div>
+                             
+                              </div>
+                            </a>
+                            </ng-container>
+                            <ng-container *ngIf="report.listOfFiles && report.listOfFiles.length !==0 && !report.listOfFiles[0].mime_type.includes('image')">
+                              <a
+                              class="flex flex-col w-40 h-40 m-2 shadow rounded-2xl cursor-pointer bg-card" 
+                              (click)="
+                                downloadFile(report)
+                              "
+                            >
+                              <div class="aspect-w-9">
+                                <pdf-viewer   
+                              class="pdf-style"
+                              (click)="downloadFile(report)"
+                              [src]="report.src"
+                                        [original-size]="false"
+                                        [render-text]="false"
+                                        [show-all]="false"
+                                        style="width: 100%;height:6.7rem;border-bottom: 1px solid gray;overflow-y: hidden;background-color: black;"
+                            ></pdf-viewer>
+                              </div>
+                              <div
+                                class="flex flex-col flex-auto pl-2.5	rounded-b-2xl	 text-left text-sm font-medium bg-white h-10 pt-2.5"
+                              >
+                              <div class="flex">
+                                Uploaded on  {{ report.created_on | date: 'dd/MMM/yyyy' }}
+  
+                                
+                                <!-- - {{ file.created_on | date: 'dd/MMM/yyyy' }} -->
+                              </div>
+                             
+                              </div>
+                            </a>
+                            </ng-container>
+                            <!-- <ng-template #noItems><span class="no-data">No data</span></ng-template> -->
+                          </ng-container>
+                          </div>
+                           
+                          </div>
+                          
+                        </ng-container>
+                        <ng-template #noItems>
+                          <div class="m-auto pt-5 pb-6"><span class="no-data">No data</span></div>
+                        </ng-template>
+                      </ng-container>
+                      <ng-template #noReports>
+                        <div class="m-auto pt-5 pb-6 items-center"><span class="no-data">No data</span></div>
+                      </ng-template>
+                    </div>
+      
+                    <div class="flex flex-wrap -m-2 mt-2 h-full" *ngIf="isLabReport">
+                      <ng-container *ngIf="labReport$ | async as reports;else noReports">
+                        <ng-container *ngIf="reports?.length; else noLabReports">
+                          <div class="flex flex-wrap w-full h-90 overflow-scroll">
+                            <ng-container *ngFor="let report of reports">
+                              <ng-container *ngIf="report.listOfFiles && report.listOfFiles.length !==0 && report.listOfFiles[0].mime_type.includes('image')">
+                                <a
+                                class="flex flex-col w-40 h-40 m-2 shadow rounded-2xl cursor-pointer bg-card bg-no-repeat	bg-cover" [ngStyle]="{background: 'linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,.4)),url(\'' + report.src  +'\')'}"
+                                (click)="
+                                  downloadFile(report)
+                                "
+                              >
+                                <div class="aspect-w-9 aspect-h-6">
+                                 
+                                </div>
+                                <div
+                                  class="flex flex-col flex-auto pl-2.5	rounded-b-2xl	 text-left text-sm font-medium bg-white h-10 pt-2.5"
+                                >
+                                <div class="flex">
+                                  Uploaded on  {{ report.created_on | date: 'dd/MMM/yyyy' }}
+    
+                                  
+                                  <!-- - {{ file.created_on | date: 'dd/MMM/yyyy' }} -->
+                                </div>
+                               
+                                </div>
+                              </a>
+                              </ng-container>
+                              <ng-container *ngIf="report.listOfFiles && report.listOfFiles.length !==0 && !report.listOfFiles[0].mime_type.includes('image')">
+                                <a
+                                class="flex flex-col w-40 h-40 m-2 shadow rounded-2xl cursor-pointer bg-card" 
+                                (click)="
+                                  downloadFile(report)
+                                "
+                              >
+                                <div class="aspect-w-9">
+                                  <pdf-viewer   
+                                class="pdf-style"
+                                (click)="downloadFile(report)"
+                                [src]="report.src"
+                                          [original-size]="false"
+                                          [render-text]="false"
+                                          [show-all]="false"
+                                          style="width: 100%;height:6.7rem;border-bottom: 1px solid gray;overflow-y: hidden;background-color: black;"
+                              ></pdf-viewer>
+                                </div>
+                                <div
+                                  class="flex flex-col flex-auto pl-2.5	rounded-b-2xl	 text-left text-sm font-medium bg-white h-10 pt-2.5"
+                                >
+                                <div class="flex">
+                                  Uploaded on  {{ report.created_on | date: 'dd/MMM/yyyy' }}
+    
+                                  
+                                  <!-- - {{ file.created_on | date: 'dd/MMM/yyyy' }} -->
+                                </div>
+                               
+                                </div>
+                              </a>
+                              </ng-container>
+                             
+                              <!-- <ng-template #noItems>No Items!</ng-template> -->
+                            </ng-container>
+                          </div>
+                         
+                        </ng-container>
+                        <ng-template #noLabReports>
+                          <div class="m-auto pt-5 pb-6"><span cl><span class="no-data">No data</span></span></div>
+                        </ng-template>
+                      </ng-container>
+                      <ng-template #noReports>
+                        <div class="m-auto pt-5 pb-6 items-center"><span class="no-data">No data</span></div>
+                      </ng-template>
+                    </div>
+                   
+                  </div>
+                </div>
+              </div>
+              <div
+                class="relative flex flex-col flex-auto bg-card shadow rounded-2xl h-350"
+              >
+                <div
+                  class="flex items-start justify-between m-6 mb-2 pb-2 border-b items-start"
+                >
+                  <div class="text-lg font-bold tracking-tight leading-6 truncate">
+                    Appointment History
+                  </div>
+                </div>
+      
+                <div class="flex flex-col flex-auto mb-4 mt-1 mx-6  overflow-y-auto">
+                  <div>
+                    <div class="flex flex-wrap mt-2">
+                      <div
+                        *ngIf="appointments$ | async as allAppointments"
+                        class="w-full"
+                      >
+                        <ng-container *ngIf="allAppointments.length; else noItems">
+                          <div
+                            class="appointments-results"
+                            infinite-scroll
+                            [scrollWindow]="false"
+                            [infiniteScrollDistance]="2"
+                            [infiniteScrollThrottle]="500"          
+                            (scrolled)="onScrollDown($event)"
+                          >
+                          <mat-grid-list
+                          cols="3"
+                          class="appointment-history"
+                          rowHeight="50px"
+                          *ngFor="let appointment of allAppointments"
+                        >
+                           
+                            <mat-grid-tile  class="text-left border-btm">
+                              <mat-card-content class="">
+                                <div>
+                                  {{appointment.schedule_typeid == '73' ? 'Video Call' : 'Clinic Visit'}} 
+                                  
+                                </div>
+                                <div class="text-xs">
+                                  {{
+                                    appointment.appointment_date
+                                      | date: "MMM d, y, hh:mm a"
+                                  }}
+                                </div>
+                             </mat-card-content>
+      
+                             
+                              
+                              
+                            </mat-grid-tile>
+                            <mat-grid-tile
+                              class="text-left border-btm"
+                              [ngClass]="{
+                                'text-yellow-500': appointment.status === 'Start' || appointment.status === 'Pending',
+                                'text-red-500': appointment.status === 'Cancelled',
+                                'text-green-500':
+                                  appointment.status === 'Completed',
+                                'text-purple-500': appointment.status === 'Running'
+                              }"
+                            >
+                              {{ appointment.status=='Start' ? 'Pending' : appointment.status}}
+                            </mat-grid-tile>
+                            <mat-grid-tile class="text-left border-btm last-item">
+                              <mat-card-content>
+                                
+                                
+                                <!-- <a class="text-blue-500 mr-4  cursor-pointer"  (click)="editPrescription(appointment.patient_id, appointment.calender_id)"> Edit</a> -->
+                                
+                                <button mat-button class="text-blue-500" *ngIf="appointment?.status === 'Running' && user.role_id !=474 && user.role_id !=481" (click)="gotoPrescription(appointment.patient_id, appointment.calender_id)">
+                                  <!-- <mat-icon class="text-blue-500 pr-1" svgIcon="heroicons_outline:download"></mat-icon> -->
+                                   View Prescription
+                                 </button> 
+      
+                                <button mat-button class="text-blue-500" *ngIf="appointment?.status === 'Completed'" (click)="displayPrescription(appointment.patient_id, appointment.calender_id)">
+                                  <mat-icon class="text-blue-500 pr-1" svgIcon="heroicons_outline:download"></mat-icon>
+                                   Downlod Prescription
+                                 </button>
+                              
+                              
+                                </mat-card-content>
+                           
+      
+                            </mat-grid-tile>
+                         
+                        </mat-grid-list>
+                          </div>
+      
+                         
+                        </ng-container>
+                        <!-- <ng-template #noItems><span class="no-data">No data</span></ng-template> -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Account balance -->
+            <div
+              class="flex flex-col flex-auto rounded-2xl overflow-hidden col-span-2 pb-6 ml-2"
+            >
+              <div class="text-lg font-bold tracking-tight leading-6 truncate">
+                Clinical Information
+              </div>
+      
+              <div class="flex flex-col mt-2">
+                <ng-container>
+                  <div class="flex flex-row items-center justify-between py-2 px-0.5">
+                    <mat-accordion class="w-full" multi="true">
+                      <ng-container>
+                        <mat-expansion-panel  [expanded]="panelOpenState"> 
+                          <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                            <mat-panel-title class="font-medium leading-tight">
+                              <div class="flex items-start mt-2">
+                                <div class="font-medium leading-tight">
+                                  Chief Complaints & HPI
+                                </div>
+                                <div class="flex items-center ml-2">
+                                  <mat-icon
+                                    (click)="addChiefComplaints()"
+                                    class="icon-size-5 text-green-500"
+                                    [svgIcon]="'heroicons_solid:plus-circle'"
+                                    [matTooltip]="'Add'"
+                                  ></mat-icon>
+                                </div>
+                              </div>
+                            </mat-panel-title>
+                          </mat-expansion-panel-header>
+                          <ng-container *ngIf="allComplaints$ | async as complaints">
+                            <ng-container *ngFor="let complaint of complaints">
+                              <div class="text-md text-secondary w-95pc">
+                                
+                                {{ complaint.complaint }}
+                                 -
+                                {{ complaint.date | date: "dd MMM, yyyy" }}
+      
+                                
+                                
+                                <span class="text-sm ml-10  align-right">
+                                  <mat-icon
+                                    class="mh-15 cursor-pointer"
+                                    svgIcon="heroicons_outline:pencil"
+                                    (click)="addChiefComplaints(complaint.complaint_id)"
+                                    [matTooltip]="'Edit'"
+                                  ></mat-icon>
+                                  <mat-icon
+                                    class="mh-15 cursor-pointer"
+                                    svgIcon="heroicons_outline:trash"
+                                    (click)="
+                                      deleteComplaintById(complaint.complaint_id)
+                                    "
+                                    [matTooltip]="'Delete'"
+                                  ></mat-icon>
+                                </span>
+                              </div>
+                            </ng-container>
+                          </ng-container>
+                          <ng-container *ngIf="!isCheifComplantData">
+                            <span class="no-data">No data</span>
+                          </ng-container>
+                        </mat-expansion-panel>
+                      </ng-container>
+      
+                      <!-- <ng-container>
+                        <mat-expansion-panel [expanded]="presentIllnessOPen">
+                          <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                            <mat-panel-title class="font-medium leading-tight">
+                              <div class="flex items-start mt-2">
+                                <div class="font-medium leading-tight">
+                                  History of Present Illness
+                                </div>
+                                <div class="flex items-center ml-2">
+                                  <mat-icon
+                                    (click)="addPresentIllnessModel()"
+                                    class="icon-size-5 text-green-500"
+                                    [svgIcon]="'heroicons_solid:plus-circle'"
+                                    [matTooltip]="'Add'"
+                                  ></mat-icon>
+                                </div>
+                              </div>
+                            </mat-panel-title>
+                          </mat-expansion-panel-header>
+                          <ng-container
+                            *ngIf="allPresentIllness$ | async as presentIllness"
+                          >
+                            <ng-container *ngFor="let illness of presentIllness">
+                              <div class="text-md text-secondary w-95pc">
+                                {{ illness?.setting }}, {{ illness?.onset }},
+                                {{ illness.isrecurrence ? "Yes" : "No" }}<br>
+                                <span class=""><b>Sign & Symtoms</b>: {{illness.symptons}}</span>
+                                <span class="text-sm ml-10 align-right">
+                                  <mat-icon
+                                    class="mh-15 cursor-pointer"
+                                    svgIcon="heroicons_outline:pencil"
+                                    (click)="updatePresentIllness(illness)"
+                                    [matTooltip]="'Edit'"
+                                  ></mat-icon>
+                                  <mat-icon
+                                    class="mh-15 cursor-pointer"
+                                    svgIcon="heroicons_outline:trash"
+                                    (click)="deletePresentIllness(illness)"
+                                    [matTooltip]="'Delete'"
+                                  ></mat-icon>
+                                </span>
+                              </div>
+                            </ng-container>
+                          </ng-container>
+                          <ng-contailner *ngIf="!isPresentIllnessData">
+                            <span class="no-data">No data</span>
+                          </ng-contailner>
+                        </mat-expansion-panel>
+                      </ng-container> -->
+      
+                      <ng-container>
+                        <mat-expansion-panel expanded>
+                          <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                            <mat-panel-title class="font-medium leading-tight">
+                              <div class="flex items-start mt-2">
+                                <div class="font-medium leading-tight">Histories</div>
+                                <div class="flex items-center ml-2">
+                                  <mat-icon
+                                    (click)="addHistoriesModel()"
+                                    class="icon-size-5 text-green-500"
+                                    [svgIcon]="'heroicons_solid:plus-circle'"
+                                    [matTooltip]="'Add'"
+                                  ></mat-icon>
+                                </div>
+                              </div>
+                            </mat-panel-title>
+                          </mat-expansion-panel-header>
+                          <ng-container>
+                            <div
+                              class="flex flex-row items-center justify-between py-2 pl-0 sm:pl-0 sm:pr-0 px-0.5"
+                            >
+                              <div class="flex flex-col">
+                                <div class="font-bold">Medical History</div>
+                                <div
+                                  class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 space-y-1 sm:space-y-0 sm:space-x-3"
+                                >
+                                  <div
+                                    *ngIf="
+                                      allMedicalHistories$ | async as medicalHistories
+                                    "
+                                  >
+                                    <div
+                                      class="flex items-center"
+                                      *ngFor="let data of medicalHistories"
+                                    >
+                                      <div class="text-md text-secondary">
+                                        {{ data.history_name }} - <span *ngIf="data.status"
+                                        class="text-green-500 capitalize"
+                                        [ngClass]="{
+                                          'text-green-500': data.status.toLowerCase() == 'active',
+                                          'inactive-style': data.status.toLowerCase() == 'inactive'}">
+                                          {{ data.status }}</span>
+                                          <!-- <span *ngIf="data.onset_date">, {{ data.onset_date | date: "dd, MMM, yyyy" }},</span> -->
+                                      <span class="align-right">
+                                        <!-- <mat-icon
+                                          class="mh-15 cursor-pointer"
+                                          svgIcon="heroicons_outline:pencil"
+                                          (click)="editMedicalHistory(data)"
+                                          [matTooltip]="'Edit'"
+                                        ></mat-icon> -->
+                                        <mat-icon
+                                          class="mh-15 cursor-pointer"
+                                          svgIcon="heroicons_outline:trash"
+                                          (click)="
+                                            deleteMedicalHistory(
+                                              data.medicalhistory_id
+                                            )
+                                          "
+                                          [matTooltip]="'Delete'"
+                                        ></mat-icon>
+                                      </span>
+                                      </div>
+                                      <br />
+                                    </div>
+                                  </div>
+                                  <div *ngIf="noMedicalHistory"><span class="no-data">No data</span></div>
+                                </div>
+                              </div>
+                            </div>
+                          </ng-container>
+                          <ng-container>
+                            <div
+                              class="flex flex-row items-center justify-between py-2 pl-0 sm:pl-0 sm:pr-0 px-0.5"
+                            >
+                              <div class="flex flex-col">
+                                <div class="font-bold">Surgical History</div>
+                                <div
+                                  class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 space-y-1 sm:space-y-0 sm:space-x-3"
+                                >
+                                  <div
+                                    *ngIf="
+                                      allSurgicalHistories$ | async as surgicalHistories;else noSurgicalItems">
+                                    <ng-container *ngIf="surgicalHistories; "> 
+                                      <div
+                                        class="flex items-center"
+                                        *ngFor="let data of surgicalHistories"
+                                      >
+                                        <div class="text-md text-secondary ">
+                                          {{ data.history_name}}<span *ngIf="data.body_site"> - {{data.body_site}}</span><span *ngIf="data?.surgery_date">, {{data.surgery_date | date: "dd MMM, yyyy"}}</span>
+                                          <span class="align-right">
+                                            <!-- <mat-icon
+                                            class="mh-15 cursor-pointer"
+                                            svgIcon="heroicons_outline:pencil"
+                                            (click)="editSurgicalHistory(data)"
+                                            [matTooltip]="'Edit'"
+                                          ></mat-icon> -->
+                                          <mat-icon
+                                            class="mh-15 cursor-pointer"
+                                            svgIcon="heroicons_outline:trash"
+                                            (click)="
+                                              deleteSurgicalHistory(
+                                                data.surgicalhistory_id
+                                              )
+                                            "
+                                            [matTooltip]="'Delete'"
+                                          ></mat-icon>
+                                          </span>
+                                          
+                                        </div>
+                                      </div>
+                                    </ng-container>
+                                    
+                                  </div>
+                                  <ng-template #noSurgicalItems><span class="no-data">No data</span></ng-template>
+                                </div>
+                              </div>
+                            </div>
+                          </ng-container>
+      
+                          <ng-container>
+                            <div
+                              class="flex flex-row items-center justify-between py-2 pl-0 sm:pl-0 sm:pr-0 px-0.5"
+                            >
+                              <div class="flex flex-col">
+                                <div class="font-bold">Social History</div>
+                                <div
+                                  class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 space-y-1 sm:space-y-0 sm:space-x-3"
+                                >
+                                <ng-container *ngIf="!isSmokingData && !isAlcoholData">
+                                  <span class="no-data">No data</span>
+                                </ng-container>
+                                
+                                <ng-container *ngIf="allSmokingHistories$ | async as smokingHistories">
+                                    <div class="flex items-center">
+                                      <div class="text-md text-secondary">
+                                         
+                                          <span *ngIf="smokingHistories.smoking_history">Current Smoker</span>
+                                          <span *ngIf="!smokingHistories.smoking_history && !smokingHistories.past_smoker">Non Smoker</span>
+                                          <span *ngIf="smokingHistories.past_smoker">{{smokingHistories?.past_smoker?'Past Smoker':' '}} </span>
+                                          <!-- <span *ngIf="!smokingHistories.past_smoker && smokingHistories.smoking_history">{{smokingHistories?.smoking_quantity}}, {{smokingHistories?.frequency}}</span> -->
+                                        <span class="align-right">
+                                          <!-- <mat-icon
+                                          class="mh-15 cursor-pointer"
+                                          svgIcon="heroicons_outline:pencil"
+                                          (click)="
+                                            editSmokingHistory(smokingHistories)
+                                          "
+                                          [matTooltip]="'Edit'"
+                                        ></mat-icon> -->
+                                        <mat-icon
+                                          class="mh-15 cursor-pointer"
+                                          svgIcon="heroicons_outline:trash"
+                                          (click)="
+                                            deleteSmokingHistory(
+                                              smokingHistories?.smoking_historyid
+                                            )
+                                          "
+                                          [matTooltip]="'Delete'"
+                                        ></mat-icon>
+                                        </span>
+                                        
+                                      </div>
+                                    </div>
+                                  </ng-container>
+                                  
+                                </div>
+                                <div
+                                  class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 space-y-1 sm:space-y-0 sm:space-x-3"
+                                >
+                                  <ng-container *ngIf="allAlcholHistories$ | async as alcholHistories">
+                                    <div class="flex items-center">
+                                      <div class="text-md text-secondary">
+                                      <span *ngIf="alcholHistories.alcohol_history">Current Alcholic</span>
+                                          <span *ngIf="!alcholHistories.alcohol_history && !alcholHistories.past_alcoholic">Non Alcholic</span>
+                                          <span *ngIf="alcholHistories.past_alcoholic">{{alcholHistories?.past_alcoholic?'Past Alcholic':' '}} </span>
+                                          <!-- <span *ngIf="!alcholHistories.past_alcoholic && alcholHistories.alcohol_history">{{alcholHistories?.alcohol_quantity}}, {{alcholHistories?.frequency}}</span> -->
+                                        <span class="align-right">
+                                          <!-- <mat-icon
+                                          class="mh-15 cursor-pointer"
+                                          svgIcon="heroicons_outline:pencil"
+                                          (click)="editAlcholHistory(alcholHistories)"
+                                          [matTooltip]="'Edit'"
+                                        ></mat-icon> -->
+                                        <mat-icon
+                                          class="mh-15 cursor-pointer"
+                                          svgIcon="heroicons_outline:trash"
+                                          (click)="
+                                            deleteAlcholHistory(
+                                              alcholHistories?.alcohol_historyid
+                                            )
+                                          "
+                                          [matTooltip]="'Delete'"
+                                        ></mat-icon>
+                                        </span>
+                                        
+                                      </div>
+                                    </div>
+                                  </ng-container>
+                                  <!-- <ng-template #noItems2>
+                                    <div class="flex items-center">
+                                      <div class="text-md text-secondary">
+                                        Alcohol History -  <span class="no-data">No data</span>
+                                        </div>
+                                      </div>
+                                  </ng-template> -->
+                                </div>
+                              </div>
+                            </div>
+                          </ng-container>
+      
+                          <ng-container>
+                            <div
+                              class="flex flex-row items-center justify-between py-2 pl-0 sm:pl-0 sm:pr-0 px-0.5"
+                            >
+                              <div class="flex flex-col">
+                                <div class="font-bold">Family History</div>
+                                <div
+                                  class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 space-y-1 sm:space-y-0 sm:space-x-3"
+                                >
+                                  <div
+                                    *ngIf="
+                                      allFamilyHistories$ | async as familyHistories;else noFamilydata
+                                    "
+                                  >
+                                    <div
+                                      class="flex items-center"
+                                      *ngFor="let data of familyHistories"
+                                    >
+                                      <div class="text-md text-secondary ">
+                                        {{ data.history_name }} -
+                                        <span class="capitalize font-semibold">{{
+                                          data.relation
+                                        }}</span>
+                                        <span class="align-right">
+                                          <!-- <mat-icon
+                                          class="mh-15 cursor-pointer"
+                                          svgIcon="heroicons_outline:pencil"
+                                          (click)="editFamilyHistory(data)"
+                                          [matTooltip]="'Edit'"
+                                        ></mat-icon> -->
+                                        <mat-icon
+                                          class="mh-15 cursor-pointer"
+                                          svgIcon="heroicons_outline:trash"
+                                          (click)="
+                                            deleteFamilyHistory(data.familyhistory_id)
+                                          "
+                                          [matTooltip]="'Delete'"
+                                        ></mat-icon>
+                                        </span>
+                                        
+                                      </div>
+                                      <br />
+                                    </div>
+                                  </div>
+                                  <ng-template #noFamilydata><span class="no-data">No data</span></ng-template>
+                                </div>
+                              </div>
+                            </div>
+                          </ng-container>
+      
+                          <ng-container *ngIf="patient$ | async as patient">
+                            <div
+                              class="flex flex-row items-center justify-between py-2 pl-0 sm:pl-0 sm:pr-0 px-0.5"
+                              *ngIf="patient.gender !== 'male'"
+                            >
+                              <div class="flex flex-col">
+                                <div class="font-bold">Menstrual History</div>
+                                <div
+                                  class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 space-y-1 sm:space-y-0 sm:space-x-3"
+                                >
+                                  <div
+                                    *ngIf="
+                                      allMenstrualHistories$
+                                        | async as menstrualHistories; else moMenustrualData
+                                    "
+                                  >
+                                    <div
+                                      class="flex items-center"
+                                      *ngFor="let data of menstrualHistories"
+                                    >
+                                      <div class="text-md text-secondary">
+                                        {{ data.frequency }}
+                                        <span class="align-right">
+                                          <!-- <mat-icon
+                                          class="mh-15 cursor-pointer"
+                                          svgIcon="heroicons_outline:pencil"
+                                          (click)="editMenstrualHistory(data)"
+                                          [matTooltip]="'Edit'"
+                                        ></mat-icon> -->
+                                        <mat-icon
+                                          class="mh-15 cursor-pointer"
+                                          svgIcon="heroicons_outline:trash"
+                                          (click)="
+                                            deleteMenstralHistory(data.menstral_id)
+                                          "
+                                          [matTooltip]="'Delete'"
+                                        ></mat-icon>
+                                        </span>
+                                        
+                                      </div>
+                                      <br />
+                                    </div>
+                                  </div>
+                                  <ng-template #moMenustrualData>
+                                    <span class="no-data">No data</span>
+                                  </ng-template>
+                                </div>
+                              </div>
+                            </div>
+                          </ng-container>
+                        </mat-expansion-panel>
+                      </ng-container>
+                      <ng-container>
+                        <mat-expansion-panel expanded>
+                          <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                            <mat-panel-title class="font-medium leading-tight">
+                              <div class="flex items-start mt-2">
+                                <div class="font-medium leading-tight">Allergies</div>
+                                <div class="flex items-center ml-2">
+                                  <mat-icon
+                                    (click)="addAllergiesModel()"
+                                    class="icon-size-5 text-green-500"
+                                    [svgIcon]="'heroicons_solid:plus-circle'"
+                                    [matTooltip]="'Add'"
+                                  ></mat-icon>
+                                </div>
+                              </div>
+                            </mat-panel-title>
+                          </mat-expansion-panel-header>
+      
+                          <ng-container>
+                            <div
+                              class="flex flex-row items-center justify-between py-2 pl-0 sm:pl-0 sm:pr-0 px-0.5"
+                            >
+                              <div class="flex flex-col">
+                                <div class="font-bold">Food Allergy</div>
+                                <ng-container
+                                  class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 space-y-1 sm:space-y-0 sm:space-x-3"
+                                  *ngIf="allFoodAllergies$ | async as foodAllergies"
+                                >
+                                  <ng-container
+                                    *ngFor="let allergies of foodAllergies"
+                                  >
+                                    <div class="flex items-center">
+                                      <div class="text-md text-secondary ">
+                                        <span
+                                          *ngFor="let allergen of allergies.allergen; let last = last;trackBy: trackByFn"
+                                        >
+                                          {{ allergen }}<span *ngIf="!last">,</span><span *ngIf="last"> - </span>
+                                        </span>
+                                        <span *ngFor="let allergen of allergies.reactions; let last = last;trackBy: trackByFn">
+                                          {{ allergen }}<span *ngIf="!last">,</span>
+                                        </span>
+                                        <span
+                                        *ngIf="allergies.status"
+                                        class="capitalize"
+                                        [ngClass]="{
+                                          'text-green-500':
+                                            allergies.status.toLowerCase() === 'active', 
+                                          'inactive-style':
+                                            allergies.status.toLowerCase() == 'inactive'
+                                        }"
+                                          > {{ allergies.status }}</span
+                                        >
+                                        <span class="text-sm align-right">
+                                          <!-- <mat-icon
+                                            class="mh-15 cursor-pointer"
+                                            svgIcon="heroicons_outline:pencil"
+                                            (click)="updateFoodAllergy(allergies)"
+                                            [matTooltip]="'Edit'"
+                                          ></mat-icon> -->
+                                          <mat-icon
+                                            class="mh-15 cursor-pointer"
+                                            svgIcon="heroicons_outline:trash"
+                                            (click)="
+                                              deleteFoodAllergyById(allergies.food_id)
+                                            "
+                                            [matTooltip]="'Delete'"
+                                          ></mat-icon>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </ng-container>
+                                  <ng-container *ngIf="!isFoodAllergy">
+                                    <span class="no-data">No data</span>
+                                  </ng-container>
+                                </ng-container>
+                              </div>
+                            </div>
+                          </ng-container>
+      
+                          <ng-container>
+                            <div
+                              class="flex flex-row items-center justify-between py-2 pl-0 sm:pl-0 sm:pr-0 px-0.5"
+                            >
+                              <div class="flex flex-col">
+                                <div class="font-bold">Drug Allergy</div>
+                                <ng-container
+                                  class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 space-y-1 sm:space-y-0 sm:space-x-3"
+                                  *ngIf="allDrugAllergies$ | async as drugAllergies; let last = last;trackBy: trackByFn"
+                                >
+                                  <ng-container
+                                    *ngFor="let allergies of drugAllergies; let last = last;trackBy: trackByFn"
+                                  >
+                                    <div class="flex items-center">
+                                      <div class="text-md text-secondary ">
+                                        <span
+                                          *ngFor="let allergen of allergies.allergen; let last = last;trackBy: trackByFn"
+                                        >
+                                          {{ allergen }}<span *ngIf="!last">,</span><span *ngIf="last"> - </span>
+                                        </span>
+                                        <span *ngFor="let allergen of allergies.reactions; let last = last;trackBy: trackByFn">
+                                          {{ allergen }}<span *ngIf="!last">,</span>
+                                        </span>
+                                        <span
+                                        *ngIf="allergies.status"
+                                        class="capitalize"
+                                        [ngClass]="{
+                                          'text-green-500':
+                                            allergies.status.toLowerCase() === 'active', 
+                                          'inactive-style':
+                                            allergies.status.toLowerCase() == 'inactive'
+                                        }"
+                                          > {{ allergies.status }}</span
+                                        >
+                                        <span class="text-sm align-right">
+                                          <!-- <mat-icon
+                                            class="mh-15 cursor-pointer"
+                                            svgIcon="heroicons_outline:pencil"
+                                            (click)="updateDrugAllergy(allergies)"
+                                            [matTooltip]="'Edit'"
+                                          ></mat-icon> -->
+                                          <mat-icon
+                                            class="mh-15 cursor-pointer"
+                                            svgIcon="heroicons_outline:trash"
+                                            (click)="
+                                            deleteDrugAllergyById(allergies.drug_id)
+                                            "
+                                            [matTooltip]="'Delete'"
+                                          ></mat-icon>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </ng-container>
+                                  <ng-container *ngIf="!isDrugAllergy">
+                                    <span class="no-data">No data</span>
+                                  </ng-container>
+                                </ng-container>
+                              </div>
+                            </div>
+                          </ng-container>
+                          <ng-container>
+                            <div
+                              class="flex flex-row items-center justify-between py-2 pl-0 sm:pl-0 sm:pr-0 px-0.5"
+                            >
+                              <div class="flex flex-col">
+                                <div class="font-bold">Environmental Allergy</div>
+                                <ng-container
+                                  class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 space-y-1 sm:space-y-0 sm:space-x-3"
+                                  *ngIf="allEnvAllergies$ | async as envAllergies"
+                                >
+                                  <ng-container
+                                    *ngFor="let allergies of envAllergies; let last = last;trackBy: trackByFn"
+                                  >
+                                    <div class="flex items-center">
+                                      <div class="text-md text-secondary ">
+                                        <span
+                                          *ngFor="let allergen of allergies.allergen; let last = last;trackBy: trackByFn"
+                                        >
+                                          {{ allergen }}<span *ngIf="!last">,</span><span *ngIf="last"> - </span>
+                                        </span>
+                                        <span *ngFor="let allergen of allergies.reactions; let last = last;trackBy: trackByFn">
+                                          {{ allergen }}<span *ngIf="!last">,</span>
+                                        </span>
+                                        <span
+                                        *ngIf="allergies.status"
+                                        class="capitalize"
+                                          [ngClass]="{
+                                            'text-green-500':
+                                              allergies.status.toLowerCase() === 'active', 
+                                            'inactive-style':
+                                              allergies.status.toLowerCase() == 'inactive'
+                                          }"
+                                          > {{ allergies.status }}</span
+                                        >
+                                        <span class="text-sm align-right">
+                                          <!-- <mat-icon
+                                            class="mh-15 cursor-pointer"
+                                            svgIcon="heroicons_outline:pencil"
+                                            (click)="updateEnvAllergy(allergies)"
+                                            [matTooltip]="'Edit'"
+                                          ></mat-icon> -->
+                                          <mat-icon
+                                            class="mh-15 cursor-pointer"
+                                            svgIcon="heroicons_outline:trash"
+                                            (click)="
+                                            deleteEnvAllergyById(allergies.environment_id)
+                                            "
+                                            [matTooltip]="'Delete'"
+                                          ></mat-icon>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </ng-container>
+                                  <ng-container *ngIf="!isEnvironmentAllergy">
+                                    <span class="no-data">No data</span>
+                                  </ng-container>
+                                </ng-container>
+                              </div>
+                            </div>
+                          </ng-container>
+                        </mat-expansion-panel>
+                      </ng-container>
+      
+                      <ng-container>
+                        <mat-expansion-panel expanded>
+                          <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                            <mat-panel-title class="font-medium leading-tight">
+                              <div class="flex items-start mt-2">
+                                <div class="font-medium leading-tight">
+                                  Examinations
+                                </div>
+                                <div class="flex items-center ml-2">
+                                  <mat-icon
+                                    (click)="addExaminationModel()"
+                                    class="icon-size-5 text-green-500"
+                                    [svgIcon]="'heroicons_solid:plus-circle'"
+                                    [matTooltip]="'Add'"
+                                  ></mat-icon>
+                                </div>
+                              </div>
+                            </mat-panel-title>
+                          </mat-expansion-panel-header>
+                          <ng-container
+                            *ngIf="allExaminations$ | async as examinations"
+                          >
+                            <ng-container *ngFor="let examin of examinations">
+                               <span class="text-sm ml-10 align-right">
+                                  <mat-icon
+                                    class="mh-15 cursor-pointer"
+                                    svgIcon="heroicons_outline:pencil"
+                                    (click)="
+                                      getPhysicalExaminationById(examin.exam_id)
+                                    "
+                                    [matTooltip]="'Edit'"
+                                  ></mat-icon>
+                                  <mat-icon
+                                    class="mh-15 cursor-pointer"
+                                    svgIcon="heroicons_outline:trash"
+                                    (click)="deleteExaminById(examin.exam_id)"
+                                    [matTooltip]="'Delete'"
+                                  ></mat-icon>
+                                </span>
+                              <div class="text-md text-secondary w-95pc">
+                                <div class="mb-2 leading-tight"  *ngIf="examin.general"><b>General<br><span class="capitalize">{{examin.general}}</span>:</b> {{ examin.general_text }}
+                                 
+                                </div>
+                                <div class="mb-2 leading-tight" *ngIf="examin.skin_hair_nails"><b>Skin, hair and nails<br><span class="capitalize">{{examin.skin_hair_nails}}</span>:</b> {{ examin.skin_hair_nails_text }}</div>
+                                <div class="mb-2 leading-tight" *ngIf="examin.head"><b>Head<br><span class="capitalize">{{examin.head}}</span>:</b> {{ examin.head_text }}</div>
+                                <div class="mb-2 leading-tight" *ngIf="examin.eyes"><b>Eyes<br><span class="capitalize">{{examin.eyes}}</span>:</b> {{ examin.eyes_text }}</div>
+                                <div class="mb-2 leading-tight" *ngIf="examin.ears"><b>Ears<br><span class="capitalize">{{examin.ears}}</span>:</b> {{ examin.ears_text }}</div>
+                                <div class="mb-2 leading-tight" *ngIf="examin.nose"><b>Nose<br><span class="capitalize">{{examin.nose}}</span>:</b> {{ examin.nose_text }}</div>
+                                <div class="mb-2 leading-tight" *ngIf="examin.mouth_throat"><b>Mouth/ Throat<br><span class="capitalize">{{examin.mouth_throat}}</span>:</b> {{ examin.mouth_throat_text }}</div>
+                                <div class="mb-2 leading-tight" *ngIf="examin.neck"><b>Neck<br><span class="capitalize">{{examin.neck}}</span>:</b> {{ examin.neck_text }}</div>
+                                <div class="mb-2 leading-tight" *ngIf="examin.breasts"><b>Breasts<br><span class="capitalize">{{examin.breasts}}</span>:</b> {{ examin.breasts_text }}</div>
+                                <div  class="mb-2 leading-tight" *ngIf="examin.lymph_nodes"><b>Lymph nodes<br><span class="capitalize">{{examin.lymph_nodes}}</span>:</b> {{ examin.lymph_nodes_text }}</div>
+                                <div class="mb-2 leading-tight" *ngIf="examin.chest"><b>Chest<br><span class="capitalize">{{examin.chest}}</span>:</b> {{ examin.chest_text }}</div>
+                                <div  class="mb-2 leading-tight" *ngIf="examin.lungs"><b>Lungs<br><span class="capitalize">{{examin.lungs}}</span>:</b> {{ examin.lungs }}</div>
+                                <div class="mb-2 leading-tight" *ngIf="examin.heart"><b>Heart<br><span class="capitalize">{{examin.heart}}</span>:</b> {{ examin.heart_text }}</div>
+                                <div class="mb-2 leading-tight" *ngIf="examin.abdomen"><b>Abdomen<br><span class="capitalize">{{examin.abdomen}}</span>:</b> {{ examin.abdomen_text }}</div>
+                                <div class="mb-2 leading-tight" *ngIf="examin.genitour_male"><b>Genitourinary (M)<br><span class="capitalize">{{examin.genitour_male}}</span>:</b> {{ examin.genitour_male_text }}</div>
+                                <div class="mb-2 leading-tight" *ngIf="examin.genitour_female"><b>Genitourinary (F)<br><span class="capitalize">{{examin.genitour_female}}</span>:</b> {{ examin.genitour_female_text }}</div>
+                                <div class="mb-2 leading-tight" *ngIf="examin.neurologic"><b>Neurologic<br><span class="capitalize">{{examin.neurologic}}</span>:</b> {{ examin.neurologic_text }}</div>
+                                <div class="mb-2 leading-tight" *ngIf="examin.psychiatric"><b>Psychiatric<br><span class="capitalize">{{examin.psychiatric}}</span>:</b> {{ examin.psychiatric_text }}</div>
+                               
+                              </div>
+                            </ng-container>
+                          </ng-container>
+                          <ng-container *ngIf="!isExaminationData">
+                            <span class="no-data">No data</span>
+                          </ng-container>
+                        </mat-expansion-panel>
+                      </ng-container>
+      
+                      <ng-container>
+                        <mat-expansion-panel expanded>
+                          <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                            <mat-panel-title class="font-medium leading-tight">
+                              <div class="flex items-start mt-2">
+                                <div class="font-medium leading-tight">Review Of System</div>
+                                <div class="flex items-center ml-2">
+                                  <mat-icon
+                                    (click)="addRosModel()"
+                                    class="icon-size-5 text-green-500"
+                                    [svgIcon]="'heroicons_solid:plus-circle'"
+                                    [matTooltip]="'Add'"
+                                  ></mat-icon>
+                                </div>
+                              </div>
+                            </mat-panel-title>
+                          </mat-expansion-panel-header>
+                          <ng-container *ngIf="allRos$ | async as RosInfo">
+                            <div
+                              class="text-md text-secondary w-95pc"
+                              *ngFor="let data of RosInfo"
+                            >
+                              {{ data.ros }} - {{ data.ros_list }}
+                              
+                              <span class="text-sm ml-4 align-right">
+                                <mat-icon
+                                  class="mh-15 cursor-pointer"
+                                  svgIcon="heroicons_outline:pencil"
+                                  (click)="editPatientRos(data)"
+                                  [matTooltip]="'Edit'"
+                                ></mat-icon>
+                                <mat-icon
+                                  class="mh-15 cursor-pointer"
+                                  svgIcon="heroicons_outline:trash"
+                                  (click)="deletePatientRos(data?.patient_ros_id)"
+                                  [matTooltip]="'Delete'"
+                                ></mat-icon>
+                              </span>
+                            </div>
+                            <ng-container *ngIf="RosInfo.length == 0">
+                              <span class="no-data">No data</span>
+                            </ng-container>
+                          </ng-container>
+                        </mat-expansion-panel>
+                      </ng-container>
+                      <ng-container>
+                        <mat-expansion-panel expanded>
+                          <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                            <mat-panel-title class="font-medium leading-tight">
+                              <div class="flex items-start mt-2">
+                                <div class="font-medium leading-tight">Diagnosis</div>
+                                <div class="flex items-center ml-2">
+                                  <mat-icon
+                                    (click)="addDiagnosisModel()"
+                                    class="icon-size-5 text-green-500"
+                                    [svgIcon]="'heroicons_solid:plus-circle'"
+                                    [matTooltip]="'Add'"
+                                  ></mat-icon>
+                                </div>
+                              </div>
+                            </mat-panel-title>
+                          </mat-expansion-panel-header>
+                          <ng-container
+                            *ngIf="allPatientDiagnosis$ | async as diagnosis"
+                          >
+                            <ng-container *ngFor="let data of diagnosis">
+                              <div class="text-md text-secondary w-95pc">
+                                {{ data?.problem }}
+                                <!-- <span *ngIf="data?.clinical_stage"> {{ data?.clinical_stage }},</span> -->
+                               
+                                <!-- <span *ngIf="data?.stage"> {{ data.stage }}</span> -->
+                                <!-- <span *ngIf="data?.onset_date !== '0001-01-01T00:00:00'"> {{data?.onset_date | date : 'dd/MMM/yyyy'}},</span> 
+                                <span *ngIf="data?.resolved_date !== '0001-01-01T00:00:00'"> {{data?.resolved_date | date : 'dd/MMM/yyyy'}},</span> -->
+                                <span class="text-sm ml-10 align-right">
+                                  <mat-icon
+                                    class="mh-15 cursor-pointer"
+                                    svgIcon="heroicons_outline:pencil"
+                                    (click)="updatePatientDiagnosis(data)"
+                                    [matTooltip]="'Edit'"
+                                  ></mat-icon>
+                                  <mat-icon
+                                    class="mh-15 cursor-pointer"
+                                    svgIcon="heroicons_outline:trash"
+                                    (click)="deletePatientDiagnosis(data)"
+                                    [matTooltip]="'Delete'"
+                                  ></mat-icon>
+                                </span>
+                              </div>
+                            </ng-container>
+                            <ng-container *ngIf="diagnosis == 0">
+                              <div><span class="no-data">No data</span></div>
+                            </ng-container>
+                          </ng-container>
+                          
+                        </mat-expansion-panel>
+                      </ng-container>
+                      <ng-container>
+                        <mat-expansion-panel expanded>
+                          <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                            <mat-panel-title class="font-medium leading-tight">
+                              <div class="flex items-start mt-2">
+                                <div class="font-medium leading-tight">
+                                  Medication
+                                </div>
+                                <div class="flex items-center ml-2">
+                                  <mat-icon
+                                    (click)="addMedication()"
+                                    class="icon-size-5 text-green-500"
+                                    [svgIcon]="'heroicons_solid:plus-circle'"
+                                    [matTooltip]="'Add'"
+                                  ></mat-icon>
+                                </div>
+                                <!-- <div class="flex items-center ml-2" *ngIf="allMedications$ | async as medis">
+                                  <mat-icon (click)="updateMedication(medis)" class="icon-size-5 text-green-500"
+                                  svgIcon="heroicons_outline:pencil"></mat-icon>
+                                </div> -->
+                              </div>
+                            </mat-panel-title>
+                          </mat-expansion-panel-header>
+                          <ng-container
+                            *ngIf="allMedications$ | async as medications"
+                          >
+                            <ng-container *ngFor="let medication of medications">
+                              <div class="text-md text-secondary w-95pc">
+                                {{ medication.drug_name }}, {{ medication.dose }},
+                                {{ medication.food }} {{ medication.frequency }}
+                                <!-- <span class="text-green-500">Active</span> -->
+                                <span class="text-sm ml-4 align-right">
+                                  <mat-icon
+                                    class="mh-15 cursor-pointer"
+                                    svgIcon="heroicons_outline:pencil"
+                                    (click)="updateMedication(medication)"
+                                    [matTooltip]="'Edit'"
+                                  ></mat-icon>
+                                  <mat-icon
+                                    class="mh-15 cursor-pointer"
+                                    svgIcon="heroicons_outline:trash"
+                                    (click)="
+                                      deleteMedication(medication.medication_id)
+                                    "
+                                    [matTooltip]="'Delete'"
+                                  ></mat-icon>
+                                </span>
+                              </div>
+                            </ng-container>
+                          </ng-container>
+                          <ng-container *ngIf="!isMedicationData">
+                            <span class="no-data">No data</span>
+                          </ng-container>
+                        </mat-expansion-panel>
+                      </ng-container>
+                      <ng-container>
+                        <mat-expansion-panel expanded>
+                          <mat-expansion-panel-header [collapsedHeight]="'56px'">
+                            <mat-panel-title class="font-medium leading-tight">
+                              <div class="flex items-start mt-2">
+                                <div class="font-medium leading-tight">
+                                  Immunisation
+                                </div>
+                                <div class="flex items-center ml-2">
+                                  <mat-icon
+                                    (click)="addImmunisation()"
+                                    class="icon-size-5 text-green-500"
+                                    [svgIcon]="'heroicons_solid:plus-circle'"
+                                    [matTooltip]="'Add'"
+                                  ></mat-icon>
+                                </div>
+                                <!-- <div class="flex items-center ml-2" *ngIf="allMedications$ | async as medis">
+                                  <mat-icon (click)="updateMedication(medis)" class="icon-size-5 text-green-500"
+                                  svgIcon="heroicons_outline:pencil"></mat-icon>
+                                </div> -->
+                              </div>
+                            </mat-panel-title>
+                          </mat-expansion-panel-header>
+                          <ng-container
+                            *ngIf="allImmunisations$ | async as immunisations"
+                          >
+                            <ng-container *ngIf="immunisations.length; else noItems">
+                              <ng-container
+                                *ngFor="let immunisation of immunisations"
+                              >
+                                <div *ngFor="let item of testObject | keyvalue">
+                                  Key: <b>{{ item.key }}</b> and Value:
+                                  <b>{{ item.value }}</b>
+                                </div>
+      
+                                <div class="text-md text-secondary w-95pc">
+                                  {{ immunisation.vaccine_name }} -
+                                  <!-- {{ immunisation.name }}, {{ immunisation.dose }},
+                                  {{ immunisation.vaccine_value }}, -->
+                                  {{
+                                    immunisation.vaccination_date
+                                      | date: "dd MMM, yyyy"
+                                  }}
+                                 
+                                  <span class="text-sm ml-4 align-right">
+                                    <mat-icon
+                                      class="mh-15 cursor-pointer"
+                                      svgIcon="heroicons_outline:pencil"
+                                      (click)="updateImmunisation(immunisation)"
+                                      [matTooltip]="'Edit'"
+                                    ></mat-icon>
+                                    <mat-icon
+                                      class="mh-15 cursor-pointer"
+                                      svgIcon="heroicons_outline:trash"
+                                      (click)="
+                                        deleteImmunisation(
+                                          immunisation.vaccination_id
+                                        )
+                                      "
+                                      [matTooltip]="'Delete'"
+                                    ></mat-icon>
+                                  </span>
+                                </div>
+                              </ng-container>
+                            </ng-container>
+                            <ng-template #noItems><span class="no-data">No data</span></ng-template>
+                          </ng-container>
+                        </mat-expansion-panel>
+                      </ng-container>
+                    </mat-accordion>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Activity Analysis" class="border-b-0 mb-5" >
+      <ng-template matTabContent>
+        <div class="flex flex-auto w-full mx-auto space-x-6 mt-6">
+          <div class="grid grid-cols-6 xl:grid-cols-6 gap-4 w-full mt-1 items-baseline">
+            <div class="grid gap-4 sm:grid-flow-row xl:grid-flow-row col-span-4 items-start" >
+              <div class="flex flex-auto w-full mx-auto space-x-6">
+                <div
+                  class="grid grid-cols-4 xl:grid-cols-4 gap-3 w-full mt-1 items-baseline"
+                >
+                  <div
+                    class="grid gap-4 sm:grid-flow-col xl:grid-flow-row col-span-4 items-start"
+                  >
+                    <div
+                      class="flex flex-col flex-auto bg-card shadow-new rounded-2xl overflow-hidden daily-log-card"
+                    >
+                      <div
+                        class="flex items-start justify-between mb-0 border-grey border-b"
+                      >
+                        <div
+                          class="pt-8 pb-8  pl-6 text-lg font-bold tracking-tight leading-6 truncate inline-flex"
+                        >
+                          Daily Logs
+                        </div>
+                        
+                        
+                      </div>
+                      <mat-grid-list cols="1" rowHeight="400px"  gutterSize="15px">
+                       
+                        <mat-grid-tile >
+                          <div class='internalMatGrid' >
+                            <mat-grid-list cols="2" rowHeight="4:1" gutterSize="15px">
+                              <mat-grid-tile  class="sub-card-design new-tile-two cursor-pointer" rowspan="2" (click)="medicineLogs()">
+                                <div class="flex flex-col flex-auto p-4  rounded-2xl shadow">
+                                  <div class="flex items-center">
+                                      <div class="flex flex-col">
+                                          <div class="mr-4 text-lg font-medium tracking-tight leading-6 truncate">Medication</div>
+                                      </div>
+                                     
+                                  </div>
+                                 
+                                  <div class="my-3 space-y-2">
+                                      <div class="flex flex-col">
+                                          <div class="flex items-center">
+                                              <div class="flex items-center justify-left w-20 h-10 rounded">
+            
+                                                <!-- <img class="w-full h-full object-cover" src="assets/images/avatars/body_weight.png"> -->
+                                                Morning
+
+                                              </div>
+                                              <div class="flex-auto ml-4 leading-none">
+                                                  <div class="text-sm font-medium text-secondary" [ngClass]="{'text-green-500': latestActivity?.medicine?.is_mrng_medicinetaken, 'text-red-500': !latestActivity?.medicine?.is_mrng_medicinetaken}">{{latestActivity?.medicine?.is_mrng_medicinetaken ? 'Yes': 'No'}}</div>                                                  
+                                              </div>
+                                             
+                                          </div>
+                                      </div>
+                                      <div class="flex flex-col">
+                                          <div class="flex items-center">
+                                            <div class="flex items-center justify-left w-20 h-10 rounded ">
+            
+                                              <!-- <img class="w-full h-full object-cover" src="assets/images/avatars/body_weight.png"> -->
+                                              Afternoon
+
+                                            </div>
+                                              <div class="flex-auto ml-4 leading-none">
+                                                <div class="text-sm font-medium text-secondary" [ngClass]="{'text-green-500': latestActivity?.medicine?.is_aftnn_medicinetaken, 'text-red-500': !latestActivity?.medicine?.is_aftnn_medicinetaken}">{{latestActivity?.medicine?.is_aftnn_medicinetaken ? 'Yes': 'No'}}</div>                                                  
+                                                 
+                                              </div>
+                                              
+                                          </div>
+                                      </div>
+                                      <div class="flex flex-col">
+                                          <div class="flex items-center">
+                                            <div class="flex items-center justify-left w-20 h-10 rounded">
+            
+                                              <!-- <img class="w-full h-full object-cover" src="assets/images/avatars/body_weight.png"> -->
+                                              Night
+
+                                            </div>
+                                              <div class="flex-auto ml-4 leading-none">
+                                                <div class="text-sm font-medium text-secondary" [ngClass]="{'text-green-500': latestActivity?.medicine?.is_night_medicinetaken, 'text-red-500': !latestActivity?.medicine?.is_night_medicinetaken}">{{latestActivity?.medicine?.is_night_medicinetaken ? 'Yes': 'No'}}</div>                                                  
+                                                
+                                              </div>
+                                             
+                                          </div>
+                                      </div>
+                                  </div>
+                                  
+                              </div>
+
+                                <!-- <div>Medication</div>
+                                <div class="flex flex-auto items-center min-w-0 pl-4">
+                                  <div class="flex-0 w-10 h-10 rounded-full overflow-hidden">
+                                      <img class="w-full h-full object-cover" src="assets/images/avatars/body_weight.png">
+                                  </div>
+                                  <div class="flex flex-col min-w-0 ml-2">
+                                    <div class="flex items-center">
+                                      <div class="ml-1.5 text-lg font-bold leading-6 truncate text-3xl bed-color">Yes</div>
+                                    </div>
+                                     
+                                  </div>
+                                </div> -->
+
+                              
+                                
+
+                                <!-- <div class="p-3">
+                                  <b>Medication</b>
+                                  <div class="pt-2">2500/2000</div>
+                                </div> -->
+                                
+                              </mat-grid-tile>
+                              <mat-grid-tile class="sub-card-design weight-border cursor-pointer" (click)="weightLogs()">
+                                <div class="flex flex-auto items-center min-w-0 pl-4">
+                                  <div class="flex-0 w-16 h-16 rounded-full overflow-hidden">
+                                      <img class="w-full h-full object-cover" src="assets/images/avatars/body_weight.png">
+                                  </div>
+                                  <div class="flex flex-col min-w-0 ml-2">
+                                    <div class="flex items-center">
+                                      <div class="ml-1.5 text-lg font-bold leading-6 truncate text-3xl weight-color">{{latestActivity?.weight || '-'}}</div>
+                                    </div>
+                                      <div class="flex items-center">
+                                          <div class="ml-1.5 leading-6 truncate text-secondary">Body weight</div>
+                                      </div>
+                                  </div>
+                                </div>
+                              </mat-grid-tile>
+                              <mat-grid-tile class="sub-card-design walking-border cursor-pointer" (click)="walkingLogs()">
+                                <div class="flex flex-auto items-center min-w-0 pl-4">
+                                  <div class="flex-0 w-16 h-16 rounded-full overflow-hidden">
+                                      <img class="w-full h-full object-cover" src="assets/images/avatars/walking.png">
+                                  </div>
+                                  <div class="flex flex-col min-w-0 ml-2">
+                                    <div class="flex items-center">
+                                      <div class="ml-1.5 text-lg font-bold leading-6 truncate text-3xl walk-color">{{latestActivity?.steps || '-'}} <span class="text-sm" *ngIf="latestActivity?.steps">steps</span></div>
+                                    </div>
+                                      <div class="flex items-center">
+                                          <div class="ml-1.5 leading-6 truncate text-secondary">Walking</div>
+                                      </div>
+                                  </div>
+                                </div>
+                              </mat-grid-tile>
+                            </mat-grid-list>
+                            <mat-grid-list cols="2" class="mt-4" rowHeight="4:1" gutterSize="15px">
+                              <mat-grid-tile class="sub-card-design water-border cursor-pointer" (click)="waterLogs()">
+                                <div class="flex flex-auto items-center min-w-0 pl-4">
+                                  <div class="flex-0 w-16 h-16 rounded-full overflow-hidden">
+                                      <img class="w-full h-full object-cover" src="assets/images/avatars/drinking-water.png">
+                                  </div>
+                                  <div class="flex flex-col min-w-0 ml-2">
+                                    <div class="flex items-center">
+                                      <div class="ml-1.5 text-lg font-bold leading-6 truncate text-3xl water-color">{{latestActivity?.water || '-'}} <span class="text-sm" *ngIf="latestActivity?.water"> {{ latestActivity.waterSetting == 199 ? "liters" : "ml" }}</span></div>
+                                    </div>
+                                      <div class="flex items-center">
+                                          <div class="ml-1.5 leading-6 truncate text-secondary">Drinking water</div>
+                                      </div>
+                                  </div>
+                                </div>
+                              </mat-grid-tile>
+                              <mat-grid-tile class="sub-card-design bed-border cursor-pointer" (click)="sleepLogs()">
+                                <div class="flex flex-auto items-center min-w-0 pl-4">
+                                  <div class="flex-0 w-16 h-16 rounded-full overflow-hidden">
+                                      <img class="w-full h-full object-cover" src="assets/images/avatars/bed_time.png">
+                                  </div>
+                                  <div class="flex flex-col min-w-0 ml-2">
+                                    <div class="flex items-center">
+                                      <div class="ml-1.5 text-lg font-bold leading-6 truncate text-3xl bed-color">{{latestActivity?.sleep || '-'}} <span class="text-sm" *ngIf="latestActivity?.sleep">hours</span></div>
+                                    </div>
+                                      <div class="flex items-center">
+                                          <div class="ml-1.5 leading-6 truncate text-secondary">Bed Time</div>
+                                      </div>
+                                  </div>
+                                </div>
+                              </mat-grid-tile>
+                              
+                            
+                            </mat-grid-list>
+                          </div>
+                        </mat-grid-tile>
+                      </mat-grid-list>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-auto w-full mx-auto space-x-6 ">
+                <div
+                  class="grid grid-cols-4 xl:grid-cols-4 gap-4 w-full  items-baseline"
+                >
+                  <div
+                    class="grid gap-4 sm:grid-flow-col xl:grid-flow-row col-span-4 items-start"
+                  >
+                   
+                  </div>
+                </div>
+              </div>
+            </div>
+             
+            <!-- Second -->
+            <div class=" flex-col flex-auto rounded-lg  col-span-2  pb-6 ml-2"
+    >
+      <div class="flex flex-col mb-3">
+        <!-- <ng-container>
+          <div class="flex flex-row items-center justify-between">
+
+            <div class="flex flex-col flex-auto p-6 bg-card rounded-2xl shadow">
+              <div class="flex items-center">
+                  <div class="flex flex-col">
+                      <div class="mr-4 text-lg font-medium tracking-tight leading-6 truncate">Symptoms</div>
+                  </div>
+                  <div class="ml-auto -mr-2">
+                      <button
+                          mat-icon-button
+                         >
+                          <mat-icon
+                          (click)="addChiefComplaints()"
+                            class="icon-size-5 text-green-500"
+                            [svgIcon]="'heroicons_solid:plus-circle'"
+                            [matTooltip]="'Add'"
+                          ></mat-icon>
+                      </button>
+                     
+                  </div>
+              </div>
+              <ng-container  *ngIf="allComplaints$ | async as complaints;else noComplaints">
+                 <div class="h-24	overflow-y-scroll">
+                  <ng-container *ngFor="let complaint of complaints">
+                    <div class="text-md text-secondary mt-3">
+                      {{complaint.complaint}}
+                    </div>
+                  </ng-container>
+                 </div> 
+               
+               
+              </ng-container>
+              <ng-template #noComplaints>
+                <span class="no-data">No data</span>
+              </ng-template>
+              
+              
+          </div>
+
+        
+
+         
+          </div>
+        </ng-container> -->
+      </div>
+
+      <div class="flex flex-col">
+        <ng-container>
+          <div class="flex flex-row items-center justify-between">
+
+            
+
+          <div class="flex flex-col flex-auto p-6 bg-card rounded-2xl shadow h-450">
+            <div class="flex items-center">
+                <div class="flex flex-col">
+                    <div class="mr-4 text-lg font-medium tracking-tight leading-6 truncate">Patient Note</div>
+                </div>
+                <div class="ml-auto  -mr-2">
+                    <button
+                        mat-icon-button
+                       >
+                        <mat-icon
+                        (click)="addActivityInformation()"
+                          class="icon-size-5 text-green-500"
+                          [svgIcon]="'heroicons_solid:plus-circle'"
+                          [matTooltip]="'Add'"
+                        ></mat-icon>
+                    </button>
+                   
+                </div>
+            </div>
+            <ng-container>
+              <ng-container *ngIf="notes?.length !== 0">
+                <div class="" *ngFor="let note of notes">
+                 
+                  <div class="text-black text-md font-bold">{{note.created_on | date:'MMMM d, y'}} </div>
+
+                  <div class="text-md text-secondary mb-2" *ngFor="let data of note.notes">
+                    <span [innerHtml]="data.description"></span>
+                  </div>
+                  <!-- <span class="text-sm ml-10 align-right">
+                    <mat-icon
+                      class="mh-15 cursor-pointer"
+                      svgIcon="heroicons_outline:pencil"
+                     
+                      [matTooltip]="'Edit'"
+                    ></mat-icon>
+                    <mat-icon
+                      class="mh-15 cursor-pointer"
+                      svgIcon="heroicons_outline:trash"
+                      [matTooltip]="'Delete'"
+                    ></mat-icon>
+                  </span> -->
+                </div>
+               
+
+              </ng-container>
+              <ng-container *ngIf="notes?.length === 0">
+              <span class="no-data">No data</span>
+            </ng-container>
+            </ng-container>
+            
+            
+        </div>
+
+         
+          </div>
+        </ng-container>
+      </div>
+    </div>
+           
+          </div>
+         
+        </div>
+
+
+         <!-- Previous statement -->
+         <div
+         class="flex flex-col flex-auto bg-card shadow-new rounded-2xl overflow-hidden mt-2 pb-9"
+       >
+         <div
+           class="flex items-start justify-between m-6 mb-2 pb-2 border-b"
+         >
+           <div
+             class="text-lg font-bold tracking-tight leading-6 truncate inline-flex"
+           >
+             Vitals
+             <button
+               mat-icon-button
+               *ngIf="appointmentId"
+               (click)="addVitals()"
+               class="ml-2 icon-size-5 pt-1 text-green-500"
+             >
+               <mat-icon
+                 class="text-green-500"
+                 [svgIcon]="'heroicons_solid:plus-circle'"
+               ></mat-icon>
+             </button>
+           </div>
+           <div class="ml-2">
+             <button
+               class="h-6 min-h-6 px-2 rounded-full bg-hover"
+               mat-button
+             >
+               <span class="font-medium text-sm text-secondary"
+                 >30 days</span
+               >
+             </button>
+           </div>
+         </div>
+         <ng-container *ngIf="patientVital$ | async as vital">
+           <div class="flex items-start mt-3 mx-6">
+             <div
+               class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-5 sm:gap-12"
+             >
+             <div
+             class="flex flex-col cursor-pointer border-r"
+             (click)="getGraphData(6)"
+           >
+             <div class="flex items-center">
+               <div
+                 class="font-medium text-secondary leading-5"
+                 [ngClass]="{ 'vital-active': vitalsType === 6 }"
+               >
+                 Blood Sugar
+               </div>
+             </div>
+             <div
+               class="flex items-start mt-2"
+               *ngIf="bloodSugar"
+             >
+               <div
+                 class="text-3xl font-bold tracking-tight leading-none"
+               >
+                 {{ bloodSugar }}
+               </div>
+               <!-- <div class="flex items-center ml-2 mr-2 mt-0.5">
+                 <mat-icon
+                   class="icon-size-5 text-green-500"
+                   [svgIcon]="'heroicons_solid:arrow-circle-up'"
+                 >
+                 </mat-icon>
+               </div> -->
+             </div>
+             <div
+               class="flex items-center"
+               *ngIf="bloodSugar"
+             >
+               <div class="font-light text-secondary mt-2 text-sm">
+                 mg/dL
+               </div>
+             </div>
+             <div
+               class="flex items-start mt-2"
+               *ngIf="!bloodSugar"
+             >
+               <div class="flex items-center ml-6 mr-2 mt-0.5">
+                 --
+               </div>
+             </div>
+           </div>
+
+               <div
+                 class="flex flex-col cursor-pointer border-r"
+                 (click)="getGraphData(1)"
+               >
+                 <div class="flex items-center">
+                   <div
+                     class="font-medium text-secondary leading-5"
+                     [ngClass]="{ 'vital-active': vitalsType === 1 }"
+                   >
+                     Blood Pressure
+                   </div>
+                 </div>
+                 <div
+                   class="flex items-start mt-2"
+                   *ngIf="vital?.bp_details"
+                 >
+                   <div
+                     class="text-3xl font-bold tracking-tight leading-none"
+                   >
+                     {{ vital?.bp_details.systolic_mmhg }}/{{
+                       vital?.bp_details.dystolic_mmhg
+                     }}
+                   </div>
+                   <!-- <div class="flex items-center ml-2 mr-2 mt-0.5">
+                     <mat-icon
+                       class="icon-size-5 text-green-500"
+                       [svgIcon]="'heroicons_solid:arrow-circle-up'"
+                     >
+                     </mat-icon>
+                   </div> -->
+                 </div>
+                 <div
+                   class="flex items-center"
+                   *ngIf="vital?.bp_details"
+                 >
+                   <div class="font-light text-secondary mt-2 text-sm">
+                     mmHg
+                   </div>
+                 </div>
+                 <div
+                   class="flex items-start mt-2"
+                   *ngIf="!vital?.bp_details"
+                 >
+                   <div class="flex items-center ml-6 mr-2 mt-0.5">
+                     --
+                   </div>
+                 </div>
+               </div>
+
+               <div
+                 class="flex flex-col cursor-pointer border-r"
+                 (click)="getGraphData(2)"
+               >
+                 <div class="flex items-center">
+                   <div
+                     class="font-medium text-secondary leading-5"
+                     [ngClass]="{ 'vital-active': vitalsType === 2 }"
+                   >
+                     Heart Rate
+                   </div>
+                 </div>
+                 <div
+                   class="flex items-start mt-2"
+                   *ngIf="vital?.heartrate_details"
+                 >
+                   <div
+                     class="text-3xl font-bold tracking-tight leading-none"
+                   >
+                     {{ vital?.heartrate_details.heart_rate }}
+                   </div>
+                   <!-- <div class="flex items-center ml-2 mt-0.5">
+                     <mat-icon
+                       class="icon-size-5 text-red-500"
+                       [svgIcon]="'heroicons_solid:arrow-circle-down'"
+                     >
+                     </mat-icon>
+                   </div> -->
+                 </div>
+                 <div
+                   class="flex items-center"
+                   *ngIf="vital?.heartrate_details"
+                 >
+                   <div class="font-light text-secondary mt-2 text-sm">
+                     BPM
+                   </div>
+                 </div>
+                 <div
+                   class="flex items-start mt-2"
+                   *ngIf="!vital?.heartrate_details"
+                 >
+                   <div class="flex items-center ml-6 mr-2 mt-0.5">
+                     --
+                   </div>
+                 </div>
+               </div>
+               <div
+                 class="flex flex-col cursor-pointer border-r"
+                 (click)="getGraphData(3)"
+               >
+                 <div class="flex items-center">
+                   <div
+                     class="font-medium text-secondary leading-5"
+                     [ngClass]="{ 'vital-active': vitalsType === 3 }"
+                   >
+                     Temperature
+                   </div>
+                 </div>
+                 <div
+                   class="flex items-start mt-2"
+                   *ngIf="vital?.tempdetails"
+                 >
+                   <div
+                     class="text-3xl font-bold tracking-tight leading-none"
+                   >
+                     {{ vital?.tempdetails.temp_f }}
+                   </div>
+                   <!-- <div class="flex items-center ml-2 mt-0.5">
+                     <mat-icon
+                       class="icon-size-5 text-amber-500"
+                       [svgIcon]="'heroicons_solid:arrow-circle-down'"
+                     >
+                     </mat-icon>
+                   </div> -->
+                 </div>
+                 <div
+                   class="flex items-center"
+                   *ngIf="vital?.tempdetails"
+                 >
+                   <div class="font-light text-secondary mt-2 text-sm">
+                     <sup>o</sup>F
+                   </div>
+                 </div>
+                 <div
+                   class="flex items-start mt-2"
+                   *ngIf="!vital?.tempdetails"
+                 >
+                   <div class="flex items-center ml-6 mr-2 mt-0.5">
+                     --
+                   </div>
+                 </div>
+               </div>
+               <div
+                 class="flex flex-col cursor-pointer border-r"
+                 (click)="getGraphData(4)"
+               >
+                 <div class="flex items-center">
+                   <div
+                     class="font-medium text-secondary pr-3 leading-5"
+                     [ngClass]="{ 'vital-active': vitalsType === 4 }"
+                   >
+                     Respiratory Rate
+                   </div>
+                 </div>
+                 <div
+                   class="flex items-start mt-2"
+                   *ngIf="vital?.respiratory_details"
+                 >
+                   <div
+                     class="text-3xl font-bold tracking-tight leading-none"
+                   >
+                     {{ vital?.respiratory_details.bmp }}
+                   </div>
+                   <div class="flex items-center ml-2 mt-0.5">
+                     <mat-icon
+                       class="icon-size-5 text-green-500"
+                       [svgIcon]="'heroicons_solid:arrow-circle-up'"
+                     >
+                     </mat-icon>
+                   </div>
+                 </div>
+                 <div
+                   class="flex items-center"
+                   *ngIf="vital?.respiratory_details"
+                 >
+                   <div class="font-light text-secondary mt-2 text-sm">
+                     BPM
+                   </div>
+                 </div>
+                 <div
+                   class="flex items-start mt-2"
+                   *ngIf="!vital?.respiratory_details"
+                 >
+                   <div class="flex items-center ml-6 mr-2 mt-0.5">
+                     --
+                   </div>
+                 </div>
+               </div>
+
+               <div
+                 class="flex flex-col cursor-pointer"
+                 (click)="getGraphData(5)"
+               >
+                 <div class="flex items-center">
+                   <div
+                     class="font-medium text-secondary leading-5"
+                     [ngClass]="{ 'vital-active': vitalsType === 5 }"
+                   >
+                     Blood Oxygen
+                   </div>
+                 </div>
+                 <div
+                   class="flex items-start mt-2"
+                   *ngIf="vital?.spo2_details"
+                 >
+                   <div
+                     class="text-3xl font-bold tracking-tight leading-none"
+                   >
+                     {{ vital?.spo2_details.value }}
+                   </div>
+                   <div class="flex items-center ml-2 mt-0.5">
+                     <mat-icon
+                       class="icon-size-5 text-green-500"
+                       [svgIcon]="'heroicons_solid:arrow-circle-up'"
+                     >
+                     </mat-icon>
+                   </div>
+                 </div>
+                 <div
+                   class="flex items-center"
+                   *ngIf="vital?.spo2_details"
+                 >
+                   <div class="font-light text-secondary mt-2 text-sm">
+                     %
+                   </div>
+                 </div>
+                 <div
+                   class="flex items-start mt-2"
+                   *ngIf="!vital?.spo2_details"
+                 >
+                   <div class="flex items-center ml-6 mr-2 mt-0.5">
+                     --
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+         </ng-container>
+         <div class="flex flex-col flex-auto h-80 mt-6 mx-6 mb-6">
+           <ng-container
+             *ngIf="emptyChart || (patientHRGraph$ | async) as patientHR"
+           >
+             <apx-chart
+               *ngIf="vitalsType !== 1"
+               [series]="chartOptions?.series"
+               [chart]="chartOptions?.chart"
+               [xaxis]="chartOptions?.xaxis"
+               [yaxis]="chartOptions?.yaxis"
+               [stroke]="chartOptions?.stroke"
+               [tooltip]="chartOptions?.tooltip"
+               [dataLabels]="chartOptions?.dataLabels"
+               [markers]="chartOptions?.markers"
+               [theme]="chartOptions?.theme"
+             >
+             </apx-chart>
+           </ng-container>
+           <ng-container
+             *ngIf="
+               emptyChart || (patientBPGraph$ | async) as patientBPG
+             "
+           >
+             <apx-chart
+               *ngIf="vitalsType === 1"
+               [chart]="chartBPOptions?.chart"
+               [series]="chartBPOptions?.series"
+               [dataLabels]="chartBPOptions?.dataLabels"
+               [plotOptions]="chartBPOptions?.plotOptions"
+               [xaxis]="chartBPOptions?.xaxis"
+               [yaxis]="chartBPOptions?.yaxis"
+               [tooltip]="chartBPOptions?.tooltip"
+             >
+             </apx-chart>
+           </ng-container>
+         </div>
+       </div>
+       <!-- Current statement -->
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Report Analysis" class="border-b-0 mb-5 cmg-reporttab">
+      <ng-template matTabContent>
+        <div class="inset-0 bg-white">
+          <!-- Main -->
+          <div class="flex flex-col flex-auto items-center justify-center h-full p-6 sm:p-10">
+              <!-- @formatter:off -->
+              <div class="w-3/12 bg-white">
+                  <img src="assets/images/pages/profile/report-analytics.gif"/>
+                  
+              </div>
+              <!-- @formatter:on -->
+              <div class="text-4xl md:text-7xl font-extrabold tracking-tight leading-tight md:leading-none text-center">Coming Soon</div>
+          </div>
+      </div>
+      
+        </ng-template>
+    </mat-tab>
+    <mat-tab label="Payments" class="border-b-0 mb-5">
+      <ng-template matTabContent>
+         <div
+          class="mt-6 flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-4 px-6 md:px-6 border-b rounded-t-2xl bg-white"
+        >
+          <div class="text-4xl font-extrabold tracking-tight">Payments</div>
+
+          
+
+          <button
+            type="button"
+            mat-flat-button
+            [color]="'primary'"
+            class="text-white rounded-full float-right mb-3"
+            [disabled]="selection?.selected?.length === 0 || billLoading"
+            (click)="generateBill()"
+          >
+            Generate bill
+            <mat-progress-spinner
+              *ngIf="billLoading"
+              [diameter]="24"
+              [mode]="'indeterminate'"
+            ></mat-progress-spinner>
+          </button>
+
+          <button
+            #print
+            printTitle="{{ printTitle }}" 
+            printSectionId="print-section"
+            ngxPrint
+            [useExistingCss]="true"
+            type="button"
+            class="hidden"
+          >
+            Generate bill
+          </button>
+          
+        </div>
+        <table
+          mat-table
+          [dataSource]="dataSource"
+          class="w-full profile-payments"
+        >
+        
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef class="col-w-10">
+              <mat-checkbox
+                (change)="$event ? toggleAllRows() : null"
+                [checked]="selection.hasValue() && isAllSelected()"
+                [indeterminate]="selection.hasValue() && !isAllSelected()"
+                [aria-label]="checkboxLabel()"
+              >
+              </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row" class="col-w-10">
+              <mat-checkbox
+                (click)="$event.stopPropagation()"
+                (change)="$event ? selection.toggle(row) : null"
+                [checked]="selection.isSelected(row)"
+                [aria-label]="checkboxLabel(row)"
+              >
+              </mat-checkbox>
+            </td>
+          </ng-container>
+
+         
+          <ng-container matColumnDef="created_on">
+            <th mat-header-cell *matHeaderCellDef class="col-w-15">Date</th>
+            <td mat-cell *matCellDef="let element" class="col-w-15">
+              {{ element.created_on | date: "dd MMM, y" }}
+            </td>
+          </ng-container>
+
+         
+          <ng-container matColumnDef="hospital_service">
+            <th mat-header-cell *matHeaderCellDef class="col-w-25">
+              Service names
+            </th>
+            <td mat-cell *matCellDef="let element" class="col-w-25">
+              {{ element.hospital_service }}
+            </td>
+          </ng-container>
+
+          
+          <ng-container matColumnDef="quantity">
+            <th mat-header-cell *matHeaderCellDef class="col-w-10">Qty</th>
+            <td mat-cell *matCellDef="let element" class="col-w-10">
+              {{ element.quantity }}
+            </td>
+          </ng-container>
+
+       
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef class="col-w-10">Amount</th>
+            <td mat-cell *matCellDef="let element" class="col-w-10">
+              &#8377;{{ element.amount }}
+            </td>
+          </ng-container>
+
+         
+          <ng-container matColumnDef="discount_amount">
+            <th mat-header-cell *matHeaderCellDef class="col-w-10">Discount</th>
+            <td mat-cell *matCellDef="let element" class="col-w-10">
+              <span *ngIf="element.discount_amount"
+                ><span *ngIf="!element.is_percent">&#8377;</span
+                >{{ element.discount_amount
+                }}<span *ngIf="element.is_percent">%</span></span
+              >
+              <span *ngIf="!element.discount_amount">--</span>
+            </td></ng-container
+          >
+
+          
+          <ng-container matColumnDef="paid_amount">
+            <th mat-header-cell *matHeaderCellDef class="col-w-10">
+              Final amt.
+            </th>
+            <td mat-cell *matCellDef="let element" class="col-w-10">
+              &#8377;{{ element.paid_amount }}
+            </td>
+          </ng-container>
+
+          
+          <ng-container matColumnDef="billed">
+            <th mat-header-cell *matHeaderCellDef class="col-w-15"></th>
+            <td mat-cell *matCellDef="let service" class="col-w-15">
+              <div class="leading-none">
+                <span
+                  *ngIf="service.pending_amount == 0"
+                  class="text-green-500 text-xs"
+                  >Paid</span
+                >
+                <span
+                  *ngIf="
+                    service.pending_amount != 0 &&
+                    service.pending_amount == service.paid_amount
+                  "
+                  class="text-red-500 text-xs"
+                  >Unpaid</span
+                >
+                <span
+                  *ngIf="
+                    service.pending_amount != 0 &&
+                    service.pending_amount != service.paid_amount
+                  "
+                  class="text-red-500 text-xs"
+                  >Partially Paid &#8377;{{
+                    service.pending_amount
+                  }}
+                  pending</span
+                >
+              </div>
+              <div class="text-xs pt-1">
+                {{ service.is_billed ? "Billed" : "Unbilled" }}
+              </div>
+            </td>
+          </ng-container>
+
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumns"
+            class="shadow-new text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+          ></tr>
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell text-center" colspan="7">No data</td>
+          </tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumns"
+            (click)="selection.toggle(row)"
+          ></tr>
+        </table>
+      </ng-template>
+    </mat-tab>
+
+  </mat-tab-group>
+</div>
+<!--**************************** 
+  Payment Pdf
+ *******************************-->
+
+<div
+    class="absolute inset-0 min-w-0 text-center overflow-auto print:overflow-visible"  [hidden]="!visibility"
+    cdkScrollable
+    id="print-section"
+    >
+
+    <!-- Main -->
+    <div class="inline-block p-6 sm:p-10 text-left print:p-0">
+
+        <!-- Invoice -->
+        <div class="w-240 p-16 rounded-2xl shadow bg-card print:w-auto print:rounded-none print:shadow-none print:bg-transparent">
+
+            <div class="flex items-start justify-between">
+                <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                    <div class="text-4xl tracking-tight text-secondary">Bill</div>
+                    <div class="text-4xl">#{{billId}}</div>
+                    <div class="font-medium tracking-tight text-secondary">Bill DATE</div>
+                    <div class="font-medium">{{currentDate | date:'dd MMM, y'}}</div>
+                    <!-- <div class="font-medium tracking-tight text-secondary">TOTAL DUE</div>
+                    <div class="font-medium">$235,000.00</div> -->
+                </div>
+                <div class="grid auto-cols-max grid-flow-col gap-x-8 -mr-16 py-6 px-8 rounded-l-2xl" *ngIf="userInfo">
+                    <div class="place-self-center w-24" >
+                        <!-- <img
+                            class="w-24"
+                            src="assets/images/logo/logo.svg"> -->
+
+                            <img
+                            *ngIf="userInfo?.logo_folderpath && userInfo?.logo_filename"
+                            class="w-24"
+                            [src]="'https://hellokidneydata.s3.ap-south-1.amazonaws.com/'+userInfo.logo_folderpath+'/'+userInfo.logo_filename"
+                            alt="Logo image"
+                            >
+                            <img
+                            *ngIf="!(userInfo?.logo_folderpath && userInfo?.logo_filename)"
+                            class="w-24"
+                            src="assets/images/logo/logo.png"
+                            alt="Logo image">
+
+                    </div>
+                    <div class="pl-5 border-l text-md border-gray-200">
+                        <div class="font-medium">{{userInfo?.hospital_name}}</div>
+                        <div>{{userInfo?.hospital_address}}</div>
+                        <div>{{userInfo?.city}}<span *ngIf="userInfo.pincode">, {{userInfo?.pincode}}</span></div>
+                        <div>{{userInfo?.clinic_mobileno}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <ng-container *ngIf="patient$ | async as patient">
+              <div class="text-md">
+                <div class="text-xl font-medium"> {{ patient.first_name }} {{ patient.last_name }}</div>
+                <div class="capitalize">{{ patient.age }}yrs, {{ patient.gender }}</div>
+                <div>+91 {{ patient.mobile_no }}</div>
+            </div>
+            </ng-container>
+           
+
+            <div class="grid grid-cols-12 gap-x-1 mt-12">
+                <!-- Columns -->
+                <div class="col-span-8 font-medium text-md text-secondary">SERVICE</div>
+                <div class="font-medium text-md text-right text-secondary">RATE</div>
+                <div class="font-medium text-md text-right text-secondary">QTY</div>
+                <div class="col-span-2 font-medium text-md text-right text-secondary">TOTAL</div>
+
+                <!-- Divider -->
+                <div class="col-span-12 my-4 border-b border-gray-200"></div>
+                <ng-container *ngFor="let service of selection?.selected">
+                  <div class="col-span-8 text-lg font-medium">{{service.hospital_service}}</div>
+                  <div class="self-center text-right">&#8377;{{service.amount}}</div>
+                  <div class="self-center text-right">{{service.quantity}}</div>
+                  <div class="col-span-2 self-center text-right">&#8377;{{service.quantity*service.amount}}</div>
+                  <div class="col-span-12 my-4 border-b border-gray-200	"></div>
+                </ng-container>
+                <!-- Item -->
+              
+
+                <!-- Subtotal -->
+                <div class="col-span-10 self-center font-medium tracking-tight text-secondary">SUBTOTAL</div>
+                <div class="col-span-2 text-right text-lg">&#8377;{{subTotalAmount}}</div>
+
+                <!-- Divider -->
+                <div class="col-span-12 my-3 border-b border-gray-200"></div>
+
+                <!-- Tax -->
+                <!-- <div class="col-span-10 self-center font-medium tracking-tight text-secondary">TAX</div>
+                <div class="col-span-2 text-right text-lg">$11,365.75</div> -->
+
+                <!-- Divider -->
+                <!-- <div class="col-span-12 my-3 border-b"></div> -->
+
+                <!-- Discount -->
+                <div class="col-span-10 self-center font-medium tracking-tight text-secondary" *ngIf="discountAmount">DISCOUNT</div>
+                <div class="col-span-2 text-right text-lg" *ngIf="discountAmount">&#8377;{{discountAmount}}</div>
+
+                <!-- Divider -->
+                <div class="col-span-12 my-3 border-b border-gray-200" *ngIf="discountAmount"></div>
+
+                <!-- Total -->
+                <div class="col-span-10 self-center text-2xl font-medium tracking-tight text-secondary">TOTAL</div>
+                <div class="col-span-2 text-right text-2xl font-medium">&#8377;{{finalAmount}}</div>
+            </div>
+
+            
+
+        </div>
+
+    </div>
+
+</div>
+

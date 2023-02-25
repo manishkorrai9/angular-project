@@ -1,0 +1,92 @@
+<div class="h-screen flex flex-col">
+    <div class="flex flex-row items-center px-6 h-20 min-h-20 text-white bg-primary">
+        <div class="text-2xl font-semibold tracking-tight">{{this.data && this.data.accountInfo ? 'Update' : 'Add'}} Doctor</div>
+        <button
+            class="ml-auto"
+            mat-icon-button
+            [matTooltip]="'Close'"
+            (click)="dialogRef.close()">
+            <mat-icon
+                class="text-current"
+                [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </button>
+    </div>
+
+    <div class="p-6 mb-auto overflow-y-auto">
+        <form [formGroup]="userForm"> 
+            <div>
+                <mat-form-field class="fuse-mat-no-subscript w-full" floatLabel="always">
+                    <mat-label>Doctor Full Name</mat-label>
+                    <input matInput [placeholder]="'Enter'" [formControlName]="'name'">
+                </mat-form-field>
+            </div>
+            <!-- <div class="mt-4">
+                <mat-form-field class="fuse-mat-no-subscript w-full" floatLabel="always">
+                    <mat-label>Last Name</mat-label>
+                    <input matInput [placeholder]="'Last Name'" [formControlName]="'lastName'">
+                </mat-form-field>
+            </div> -->
+            <!-- <div class="mt-4">
+                <mat-form-field class="fuse-mat-no-subscript w-full" floatLabel="always">
+                    <mat-label>Clinic / Hospitals</mat-label>
+                    <mat-select [formControlName]="'clinicId'" placeholder="Select">
+                        <ng-container *ngFor="let data of hospitals">
+                            <mat-option [value]="data.clinicid">{{
+                                data.clinic_name
+                                }}</mat-option>
+                        </ng-container>
+                    </mat-select>
+                </mat-form-field>
+            </div> -->
+            <div class="mt-4"> 
+                <mat-form-field class="fuse-mat-no-subscript w-full" floatLabel="always">
+                    <mat-label>Speciality</mat-label>
+                    <mat-select [formControlName]="'specialityid'" placeholder="Select">
+                        <ng-container *ngFor="let data of specialities">
+                            <mat-option [value]="data.speciality_id">{{
+                                data.speciality_name
+                                }}</mat-option>
+                        </ng-container>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="mt-4">
+                <mat-form-field class="fuse-mat-no-subscript w-full" floatLabel="always">
+                    <mat-label>Email</mat-label>
+                    <input matInput [placeholder]="'Sample@domain.com'" [formControlName]="'email'">
+                </mat-form-field>
+            </div>
+            <div class="mt-4">
+                <mat-form-field class="fuse-mat-no-subscript w-full" floatLabel="always">
+                    <mat-label>Phone</mat-label>
+                    <input matInput [placeholder]="'Enter'" [formControlName]="'mobileNumber'">
+                </mat-form-field>
+                <span *ngIf="userForm.controls.mobileNumber.errors?.required && userForm.controls.mobileNumber.touched || userForm.controls.mobileNumber.errors?.pattern"
+                    class="text-red-500 text-xs italic">
+                    Please enter a valid phone number
+                </span>
+            </div>
+            
+        </form>
+    </div>
+
+    <footer class="my-4 mx-4">
+        <div class="flex">
+            <div class="flex ml-auto gap-2">
+                <button  mat-flat-button (click)="dialogRef.close()" *ngIf="this.data && this.data.accountInfo">
+                    <span class="ml-2 mr-1">Cancel</span>
+                </button>
+                <button  mat-flat-button (click)="clear()" *ngIf="!(this.data && this.data.accountInfo)">
+                    <span class="ml-2 mr-1">Clear</span>
+                </button>
+                <button mat-flat-button [color]="'primary'"   (click)="addUser()" [disabled]="userForm.invalid || userActionLoading">
+                    <span class="ml-2 mr-1">{{this.data && this.data.accountInfo ? 'Update' : 'Save'}}</span>
+                    <mat-progress-spinner
+                        *ngIf="userActionLoading"
+                        [diameter]="24"
+                        [mode]="'indeterminate'"></mat-progress-spinner>
+                </button>
+            </div>
+          </div>          
+    </footer>
+</div>

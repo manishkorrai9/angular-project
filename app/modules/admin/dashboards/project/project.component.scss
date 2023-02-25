@@ -1,0 +1,45 @@
+.inventory-grid {
+  grid-template-columns: 48px auto 40px;
+
+  @screen sm {
+    grid-template-columns: 48px auto 112px 72px;
+  }
+
+  @screen md {
+    grid-template-columns: 160px auto 112px 72px;
+  }
+
+  @screen lg {
+    grid-template-columns: 25% 20% 20% 15% 20%;
+  }
+}
+.doctor-inventory-grid {
+  grid-template-columns: 48px auto 40px;
+
+  @screen sm {
+    grid-template-columns: 48px auto 112px 72px;
+  }
+
+  @screen md {
+    grid-template-columns: 160px auto 112px 72px;
+  }
+
+  @screen lg {
+    grid-template-columns: 30% 25% 25% 20%;
+  }
+}
+.requested-inventory-grid{
+    grid-template-columns: 48px auto 40px;
+  
+    @screen sm {
+      grid-template-columns: 48px auto 112px 72px;
+    }
+  
+    @screen md {
+      grid-template-columns: 160px auto 112px 72px;
+    }
+  
+    @screen lg {
+      grid-template-columns: 25% 20% 20% 20% 10%;
+    }
+  }

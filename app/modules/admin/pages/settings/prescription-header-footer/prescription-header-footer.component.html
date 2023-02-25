@@ -1,0 +1,123 @@
+<div 
+    class="clinic-profile sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent"
+  >
+  <div class="clinic-profile-tab">
+    <div class="content">
+        <form>
+            <div class="grid sm:grid-cols-4 gap-6 w-full mt-8 px-12">
+              <div class="sm:col-span-4">
+                <div>Header Upload:</div>
+                <!-- <mat-grid-list cols="2">
+                  <mat-grid-tile
+                    ><mat-label>Header Image: </mat-label></mat-grid-tile
+                  >
+                 
+                </mat-grid-list> -->
+        
+                <div class="mt-2 ">
+                  <label
+                    class="no-border hoverable header-size"
+                    for="fileInput"
+                  >
+                    <img class="border-0" [src]="header ? header : 'assets/images/avatars/white-bg.png'"  />
+        
+                    <div class="background"></div>
+                    <div>
+                        <mat-label
+                        >i.e: width:800px, Height: 144px; File
+                        Size: 50kb</mat-label
+                      >
+                    </div>
+                    <div
+                          class="flex justify-center"
+                        >
+                          <div class="absolute"></div>
+                          <div
+                            class="bg-gy mt-2 py-0.5 px-3 rounded-full text-sm font-semibold text-pink-800 bg-gray-100 dark:text-pink-50 dark:bg-gray-500 ng-star-inserted"
+                          >
+                            Update Image
+                          </div>
+                          <div class="flex items-center"></div>
+                        </div>
+                    <!-- <mat-grid-list cols="2">
+                     
+                      <mat-grid-tile
+                        >
+                        
+                      </mat-grid-tile>
+                    </mat-grid-list> -->
+                  </label>
+        
+                  <br />
+                  <input
+                    id="fileInput"
+                    type="file"
+                    (change)="onSelectFile($event)"
+                  />
+                </div>
+              </div>
+              <div class="sm:col-span-4 mt-4">
+                <mat-label>Footer Upload: </mat-label>
+                <!-- <mat-grid-list cols="2">
+                  <mat-grid-tile
+                    ></mat-grid-tile
+                  >
+                 
+                </mat-grid-list> -->
+        
+                <mat-label></mat-label>
+                <div class="mt-2">
+                  <label
+                    class="no-border hoverable header-size"
+                    for="footerFileInput"
+                  >
+                    <img class="border-0" [src]="footer ? footer : 'assets/images/avatars/white-bg.png'" />
+        
+                    <div class="background"></div>
+                    <mat-label
+                          >i.e: width:800px, Height: 72px; File Size:
+                          50kb</mat-label
+                        >
+                        <div
+                          class="flex justify-center"
+                        >
+                          <div class="absolute"></div>
+                          <div
+                            class="mt-2 bg-gy py-0.5 px-3 rounded-full text-sm font-semibold text-pink-800 bg-gray-100 dark:text-pink-50 dark:bg-gray-500 ng-star-inserted"
+                          >
+                            Update Image
+                          </div>
+                          <div class="flex items-center">
+        
+                          </div>
+                        </div>
+                   
+                  </label>
+        
+                  <br />
+                  <input
+                    id="footerFileInput"
+                    type="file"
+                    (change)="onFooterSelectFile($event)"
+                  />
+                </div>
+              </div>
+            </div>
+            <!-- <div class="flex items-center justify-end mt-10 px-12">
+              <button
+                class="ml-4"
+                mat-flat-button
+                type="button"
+                [color]="'primary'"
+                (click)="saveHeaderFooter()"
+              >
+                
+                {{headerId || footerId ? 'Update':'Save'}}
+              </button>
+            </div> -->
+          </form>
+      </div>
+  </div>
+  
+ 
+  </div>

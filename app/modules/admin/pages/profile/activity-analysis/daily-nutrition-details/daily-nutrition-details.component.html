@@ -1,0 +1,96 @@
+<div class="flex flex-col w-full overflow-auto bg-card">
+    <div class="flex flex-row items-center px-6 h-20 min-h-20 text-white bg-primary">
+      <div class="ml-3 text-2xl font-semibold tracking-tight">Daily Plan</div>
+      <button class="ml-auto" mat-icon-button (click)="dialogRef.close()">
+        <mat-icon
+          class="text-current"
+          [svgIcon]="'heroicons_outline:x'"
+        ></mat-icon>
+      </button>
+    </div>
+    <div class="flex-auto px-6 pt-9 pb-12  md:pb-12 lg:pl-12 lg:pr-12">
+      <div>
+        <div class="text-right py-2"> 
+            <span [ngClass]="{'text-blue-500' : date_type == 'Today'}" class="cursor-pointer font-bold" (click)="sendDateType('Today')">Today</span>
+            <span class=" fsz-10 font-bold px-2">|</span>
+            <span [ngClass]="{'text-blue-500' : date_type == 'Week'}" class="cursor-pointer font-bold" (click)="sendDateType('Week')">Week</span>
+            <span class="fsz-10 font-bold px-2">|</span>
+            <span [ngClass]="{'text-blue-500' :date_type == 'Month'}" class="cursor-pointer font-bold" (click)="sendDateType('Month')">Month</span>    
+        </div>
+        <div *ngIf="neutrition_log_details.length !== 0">
+         <table>
+
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Schedule</th>
+                <th colspan="2">Micro</th>
+                <th colspan="2">Macro</th>
+              </tr>
+            </thead>
+
+            <tbody> 
+              <tr *ngFor="let neutrition of neutrition_log_details">
+                <td class="font-bold">{{neutrition.date | date:'MMMM d, y'}}</td>
+                <td >
+                    <div *ngFor="let food_details of neutrition.foodServe_Type">
+                        <ng-container *ngIf="food_details.getfoodlogs?.length !== 0">
+                            <div class="pb-3">
+                                <h4 class="text-blue-500 font-semibold pt-3">{{food_details.serve_type}}</h4>
+                                <ng-container *ngFor="let item of food_details.getfoodlogs">
+                                    <p class="font-semibold">{{item.item_name}}</p>
+                                </ng-container>
+                            </div> 
+                        </ng-container>
+                    </div>
+                </td>
+                <td>
+                    <div  class="font-bold">Sodium </div>
+                    <div  class="font-bold">Potassium  </div>
+                </td>
+                <td>
+                    <div class="font-semibold text-blue-500" >{{neutrition.microMacro_TrackonCount[0].micro_sodium}}</div>
+                    <div class="font-semibold text-blue-500">{{neutrition.microMacro_TrackonCount[0].micro_potassium}}</div>
+                </td>
+                <td>
+                    <div class="font-bold">Calorie’s  </div>
+                    <div class="font-bold">Carbs  </div>
+                    <div class="font-bold">Protein </div>
+                    <div class="font-bold">Fat  </div>
+                    <div class="font-bold">Dietary Fiber</div>
+                </td>
+                <td>
+                    <div class="font-semibold text-blue-500">{{neutrition.microMacro_TrackonCount[0].macro_calories}}</div>
+                    <div class="font-semibold text-blue-500">{{neutrition.microMacro_TrackonCount[0].macro_totalcarbs}}</div>
+                    <div class="font-semibold text-blue-500">{{neutrition.microMacro_TrackonCount[0].macro_protein}}</div>
+                    <div class="font-semibold text-blue-500">{{neutrition.microMacro_TrackonCount[0].macro_calories_fat}}</div>
+                    <div class="font-semibold text-blue-500">{{neutrition.microMacro_TrackonCount[0].macro_dietary}}</div>
+                </td>
+              </tr>
+              </tbody>
+          </table>
+          
+        </div>
+        <div *ngIf="neutrition_log_details.length == 0">
+         
+            <div class="font-bold py-10 flex items-center  justify-center w-full h-full rounded-full text-lg ">
+                No data
+            </div>
+                <!-- <div class="m-auto pt-5 pb-6 items-center">
+                    <span class="no-data">No data</span>
+                  </div> -->
+        </div>
+     </div>
+     <!-- <div *ngIf="medicineLogs.length == 0">
+         
+        <div class="flex items-center justify-center w-full h-full rounded-full text-lg ">
+            No data
+        </div>
+          
+    </div>
+   -->
+      <!-- Divider -->
+      <!-- Actions -->
+      
+    </div>
+  </div>

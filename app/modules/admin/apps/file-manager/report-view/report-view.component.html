@@ -1,0 +1,48 @@
+<div class="flex flex-col flex-auto p-6 md:p-8">
+
+    <!-- Close button -->
+    <div class="flex items-center justify-end">
+        <button
+            mat-icon-button
+            (click)="close()">
+            <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </button>
+    </div>
+
+    <!-- Preview -->
+    <div class="aspect-w-9 aspect-h-6 mt-8">
+        <div class="items-center justify-center rounded-lg ">
+            <div *ngFor="let file of files">
+    
+                <div *ngIf="file.mime_type.includes('image')" class="img-viewer">
+                 
+                    <img  [src]="file.src" class='wh-60 mb-4'/>
+
+                </div>
+                
+                <div class="pdf-viewer"  *ngIf="!file.mime_type.includes('image')">
+                    <pdf-viewer   
+                 
+                    [src]="file.src"
+                              [render-text]="true"
+                              [original-size]="false"
+                              [render-text]="true"
+                              [zoom]="1"
+                              [fit-to-page]="true"
+                              style="width: 99%; height: 80vh;border:1px solid gray"
+                  ></pdf-viewer>
+          
+                </div>
+                  
+            
+                
+              </div>
+
+        </div>
+    </div>
+
+   
+
+
+
+</div>

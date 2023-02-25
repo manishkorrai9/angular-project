@@ -1,0 +1,238 @@
+<div
+  class="sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent"
+>
+  <div
+    class="sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent"
+  >
+    <div
+      class="relative flex flex-col sm:flex-row flex-0 sm:justify-between sm:items-center py-6 px-6 md:px-8 border-b"
+    >
+      <!-- <div class="text-4xl font-extrabold tracking-tight">Add Tests</div> -->
+
+      <div class="text-4xl font-extrabold tracking-tight">Add Tests</div>
+
+      <!-- Search -->
+      <!-- <table>
+      
+     </table> -->
+    </div>
+
+    <!-- Main -->
+    <table class="mr-8">
+      <tr class="">
+        <td class="pl-9 pt-5 pb-5">
+          <mat-label><b>Master Test List</b>
+            <mat-form-field
+            class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-rounded w-2/4 ml-5"
+          >
+            <mat-icon
+              class="icon-size-5"
+              matPrefix
+              [svgIcon]="'heroicons_solid:search'"
+            ></mat-icon> 
+            <input
+              matInput
+              (keyup)="applyFilter($event.target.value)"
+              [autocomplete]="'off'"
+              [placeholder]="'Search for Test Name'"
+            /> </mat-form-field
+        >
+          </mat-label>
+          <a
+            class="text-blue-500 float-right cursor-pointer pt-2.5"
+            (click)="addNewTest()"
+            ><u>Add Test</u></a
+          >
+          <!-- <button mat-raised-button color="primary" (click)="addNewTest()">
+            Add Test
+          </button> -->
+        </td>
+
+        <td class="pl-9">
+          <mat-label><b>Organization Master Test List</b> </mat-label>
+          <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-rounded w-2/4 ml-5">
+            <mat-icon
+              class="icon-size-5"
+              matPrefix
+              [svgIcon]="'heroicons_solid:search'"
+            ></mat-icon> 
+            <input
+              matInput
+              (keyup)="filterOrganizationMasterTestList($event.target.value)"
+              [autocomplete]="'off'"
+              [placeholder]="'Search for Test Name'"
+            /> </mat-form-field>
+          <!-- <button mat-raised-button color="primary" (click)="removeSelectedRows()">
+            Move To First Table
+          </button> -->
+        </td>
+      </tr>
+      <tr class="w-full">
+        <td class="w-6/12">
+          <div class="example-container mat-elevation-z8">
+            <mat-table #table [dataSource]="dataSource">
+              <!-- Checkbox Column -->
+              <ng-container matColumnDef="select">
+                <mat-header-cell *matHeaderCellDef>
+                  <mat-checkbox
+                    (change)="$event ? masterToggle() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()"
+                  >
+                  </mat-checkbox>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                  <mat-checkbox
+                    (click)="$event.stopPropagation()"
+                    (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)"
+                  >
+                  </mat-checkbox>
+                </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="name">
+                <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+
+                <mat-cell *matCellDef="let element">
+                  {{ element.test_name }}
+                </mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="unit">
+                <mat-header-cell *matHeaderCellDef class="">
+                  Unit
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.unit ? element.unit : '--'}} </mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="rangetext">
+                <mat-header-cell *matHeaderCellDef class="">
+                  Range text
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.range ? element.range : '--'}} </mat-cell>
+              </ng-container>
+
+              <!-- Symbol Column -->
+              <ng-container matColumnDef="symbol">
+                <mat-header-cell *matHeaderCellDef>
+                  <mat-icon
+                    class="cursor-pointer text-blue-500"
+                    (click)="transferSelectedRows()"
+                    svgIcon="heroicons_outline:arrow-right"
+                  ></mat-icon>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                  <mat-icon
+                    class="cursor-pointer text-blue-500"
+                    (click)="transferSelectedRows()"
+                    svgIcon="heroicons_outline:arrow-right"
+                  ></mat-icon>
+                </mat-cell>
+              </ng-container>
+
+              <mat-header-row
+                *matHeaderRowDef="displayedColumns"
+              ></mat-header-row>
+              <mat-row *matRowDef="let row; columns: displayedColumns">
+              </mat-row>
+            </mat-table>
+            <!-- <div  
+            style="display: flex; justify-content: center;  background: white;">
+           <mat-progress-spinner *ngIf="!isLoading" 
+             color="primary" 
+             mode="indeterminate">
+           </mat-progress-spinner>
+         </div> -->
+            <!-- <mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]">
+            </mat-paginator> -->
+          </div>
+        </td>
+
+        <td class="w-6/12">
+          <div class="example-container mat-elevation-z8">
+            <mat-table #table [dataSource]="checkedDataSource">
+              <!-- Checkbox Column -->
+              <ng-container matColumnDef="select">
+                <mat-header-cell *matHeaderCellDef>
+                  <mat-checkbox
+                    (change)="$event ? masterCheckedToggle() : null"
+                    [checked]="
+                      checkedSelection.hasValue() && isAllCheckedSelected()
+                    "
+                    [indeterminate]="
+                      checkedSelection.hasValue() && !isAllCheckedSelected()
+                    "
+                  >
+                  </mat-checkbox>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row">
+                  <mat-checkbox
+                    (click)="$event.stopPropagation()"
+                    (change)="$event ? checkedSelection.toggle(row) : null"
+                    [checked]="checkedSelection.isSelected(row)"
+                  >
+                  </mat-checkbox>
+                </mat-cell>
+              </ng-container>
+
+              <!-- Name Column -->
+              <ng-container matColumnDef="name">
+                <mat-header-cell *matHeaderCellDef>
+                  Name
+                 </mat-header-cell>
+
+                <mat-cell *matCellDef="let element">
+                  {{ element.hospital_test_name }}
+                </mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="unit">
+                <mat-header-cell *matHeaderCellDef class="">
+                  Unit
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.unit ? element.unit : '--'}} </mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="rangetext">
+                <mat-header-cell *matHeaderCellDef class="">
+                  Range text
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{element.range ? element.range : '--'}} </mat-cell>
+              </ng-container>
+
+              <!-- Symbol Column -->
+              <ng-container matColumnDef="symbol">
+                <mat-header-cell *matHeaderCellDef>
+                  <mat-icon
+                    class="cursor-pointer text-blue-500"
+                    color="primary"
+                    (click)="removeSelectedRows()"
+                    svgIcon="heroicons_outline:arrow-left"
+                  ></mat-icon>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let element" (click)="openReangeTest(element)">
+                  <mat-icon
+                    class="cursor-pointer"
+                    svgIcon="heroicons_outline:pencil"
+                  ></mat-icon>
+                </mat-cell>
+              </ng-container>
+
+              <mat-header-row
+                *matHeaderRowDef="displayedColumns"
+              ></mat-header-row>
+              <!-- <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell text-center">No data</td> 
+              </tr> -->
+              <mat-row *matRowDef="let row; columns: displayedColumns">
+              </mat-row>
+            </mat-table>
+            <!-- <div *ngIf="!checkedDataSource.data.length" style="display: flex; justify-content: center;">
+              No records found
+            </div> -->
+            <!-- <mat-paginator #checkedpaginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]">
+            </mat-paginator> -->
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

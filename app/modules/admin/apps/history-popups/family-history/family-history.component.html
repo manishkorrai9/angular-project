@@ -1,0 +1,79 @@
+<div class="flex flex-col">
+  <form
+    class="flex-auto px-6"
+    [formGroup]="familyHistoryForm"
+    #familyHistoryNGForm="ngForm"
+  >
+    <div class="grid sm:grid-cols-4 gap-6 w-full mt-8">
+      
+      <div class="sm:col-span-4 form-group">
+        <mat-label>Problem/Condition <span>*</span></mat-label>
+        <br />
+        <div class="grid sm:grid-cols-1 gap-4 w-full">
+          <section class="example-section">
+            <mat-checkbox
+              class="example-margin"
+              [color]="'primary'"
+             
+              *ngFor="let problem of problems" 
+              [checked] = "problem.checked"
+              (change)="selectedSymptom(problem, $event)"
+            >
+              {{ problem.data_name }}
+            </mat-checkbox>
+          </section>
+        </div>
+      </div>
+      <div class="sm:col-span-2 form-group">
+        <mat-form-field
+          class="fuse-mat-no-subscript w-full"
+          floatLabel="always"
+        >
+          <mat-label>Relationship <span>*</span></mat-label>
+          <mat-select
+            [placeholder]="'Select'"
+            [formControlName]="'relationship'"
+          >
+            <mat-option [value]="data.masterdata_id" *ngFor="let data of relationShips">{{data.data_name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div
+          *ngIf="f.relationship.touched && f.relationship.invalid"
+          class="alert alert-danger"
+        >
+          <div
+            *ngIf="f.relationship.errors && f.relationship.errors.required"
+          >
+          Relationship is required.
+          </div>
+        </div>
+      </div>
+      <!-- <div class="sm:col-span-4 form-group">
+        <mat-form-field
+          class="fuse-mat-no-subscript w-full"
+          floatLabel="always"
+        >
+          <mat-label>Notes</mat-label>
+          <input matInput [formControlName]="'note'" [placeholder]="'Enter'" />
+        </mat-form-field>
+      </div> -->
+    </div>
+    <!-- Divider -->
+    <div class="mt-11 mb-10 border-t"></div>
+    <!-- Actions -->
+    <div class="flex items-center justify-end">
+      <button mat-flat-button type="button" class="mr-2" [disabled]="familyHistoryForm.invalid || selectedProblems.length == 0">
+        <span class="ml-2 mr-1" (click)="onReset()">Cancel</span>
+      </button>
+      <button
+        type="submit"
+        mat-flat-button
+        [color]="'primary'"
+        [disabled]="familyHistoryForm.invalid || selectedProblems.length == 0"
+        (click)="onSubmit()"
+      >
+        <span class="ml-2 mr-1">{{familyhistory_id?'Update':'Save'}}</span>
+      </button>
+    </div>
+  </form>
+</div>
